@@ -4,7 +4,8 @@
 #include <set>
 #include <fstream>
 using namespace std;
-#define N 10
+#define N 1
+#include "htmlParser.h"
 
 /*
 LibraryMymeType
@@ -46,6 +47,9 @@ int main(int argc, char* argv[])
                     std::string stringdata = std::string(blob.data(), blob.size());
                     const char *zptr = stringdata.c_str();  // c_str() guarantees, that the pointer points to zero terminated data
                     std::cout << zptr << std::endl;
+                    string h(zptr);
+                    cout << parse_html(h);
+
                     c ++ ;
                     f << zptr;
                     f.close();
