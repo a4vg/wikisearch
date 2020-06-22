@@ -144,6 +144,10 @@ void Preprocessor::tokenize(std::string &word)
 
 void Preprocessor::lemmatize(std::string &word)
 {
+  if (word.empty()) return;
+
+  if (lemmadic.count(word) == 0)
+    return; // word not in map
   word = lemmadic[word];
 }
 
