@@ -12,15 +12,31 @@ class Preprocessor {
   std::string outfilename;
   std::vector<std::string> stopwords;
   std::map<std::string, std::string> lemmadic;
-
+  std::map<std::string, std::string> withoutTilde = {
+    {"á", "a"},
+    {"é", "e"},
+    {"í", "i"},
+    {"ó", "o"},
+    {"ú", "u"},
+    {"Á", "A"},
+    {"É", "E"},
+    {"Í", "I"},
+    {"Ó", "O"},
+    {"Ú", "U"}
+  };
+  
   bool isLetter(int c);
+  bool hasTilde(int c);
+
   void loadLemmatizerDic(std::string lemmadic_filename);
   void loadStopwords(std::string sw_filename);
+  void loadLemma(std::string lem_filename);
+
   void removeStopword(std::string &word);
   void lowerStr(std::string &word);
   void tokenize(std::string &word);
   void lemmatize(std::string &word);
-  void loadLemma(std::string lem_filename);
+  void removeTilde(std::string &word);
 
   public:
     Preprocessor
@@ -41,6 +57,13 @@ bool Preprocessor::isLetter(int c)
 {
   // If c<0 is not ascii. Could be a latin character
   return (c<0) || ('a'<=c && c<='z') || ('A'<=c && c<='Z');
+}
+
+bool Preprocessor::hasTilde(int c)
+{
+  // A vowel with tilde is represented by two chars
+  // The first char is -61
+  return c==-61;
 }
 
 void Preprocessor::loadLemmatizerDic(std::string lem_filename)
@@ -124,6 +147,24 @@ void Preprocessor::lemmatize(std::string &word)
   word = lemmadic[word];
 }
 
+void Preprocessor::removeTilde(std::string &word)
+{
+  for (int i=0; i<word.length(); ++i)
+  {
+    if (this->hasTilde(word[i]))
+    { // Vowel with tilde is represented by two chars or a string.
+      // string(it, it+2) builds a string with this two chars and
+      // ++it skips the second char
+
+      std::string newword = word.substr(0, i);
+      newword += this->withoutTilde[word.substr(i, 2)];
+      newword += word.substr(i+2, word.length()-i-2);
+      word = newword;
+      break; // assumes there's just one tilde 
+    }
+  }
+}
+
 void Preprocessor::preprocess() {
   // Open files
   std::ifstream infile(this->infilename);
@@ -145,6 +186,7 @@ void Preprocessor::preprocess() {
       this->lowerStr(word);
       this->removeStopword(word);
       this->lemmatize(word);
+      this->removeTilde(word);
 
       if (!word.empty())
         outfile << word << "\n";
