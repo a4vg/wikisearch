@@ -5,13 +5,13 @@
 #include <fstream> // ifstream, ofstream
 #include <sstream> // stringstream
 #include <cctype> // tolower
-#include "lemmagen/src/RdrLemmatizer.h" // lemmatizer
+#include <map>
 
 class Preprocessor {
   std::string infilename;
   std::string outfilename;
   std::vector<std::string> stopwords;
-  RdrLemmatizer *lemmatizer = nullptr;
+  std::map<std::string, std::string> lemmadic;
 
   bool isLetter(int c);
   void loadLemmatizerDic(std::string lemmadic_filename);
@@ -20,11 +20,12 @@ class Preprocessor {
   void lowerStr(std::string &word);
   void tokenize(std::string &word);
   void lemmatize(std::string &word);
+  void loadLemma(std::string lem_filename);
 
   public:
     Preprocessor
-    (std::string _infilename, std::string _outfilename, std::string sw_filename="stopwords/stopwords-es.txt", std::string lemmadic_filename="lemmagen/dictionaries/spanish.bin");
-    ~Preprocessor();
+    (std::string _infilename, std::string _outfilename, std::string sw_filename="stopwords/stopwords-es.txt", std::string lemmadic_filename="lemma-dictionaries/lemmatization-es.txt");
+    ~Preprocessor(){};
     void preprocess();
 };
 
@@ -36,29 +37,24 @@ infilename(_infilename), outfilename(_outfilename)
   loadLemmatizerDic(lemmadic_filename);
 };
 
-Preprocessor::~Preprocessor()
-{
-  delete lemmatizer;
-}
-
 bool Preprocessor::isLetter(int c)
 {
   // If c<0 is not ascii. Could be a latin character
   return (c<0) || ('a'<=c && c<='z') || ('A'<=c && c<='Z');
 }
 
-void Preprocessor::loadLemmatizerDic(std::string lemmadic_filename)
+void Preprocessor::loadLemmatizerDic(std::string lem_filename)
 {
-  // Check if file exists
-  std::ifstream infile(lemmadic_filename);
-  if (!infile.good()){
-    std::cout << "Can not open lemmagen dictionary";
-    throw "Can not open lemmagen dictionary";
-  }
+  std::ifstream lemmadic_file(lem_filename);
+  std::string line;
 
-  // Load library
-  const char *cstr_filename = lemmadic_filename.c_str();
-  this->lemmatizer = new RdrLemmatizer(cstr_filename);
+  std::string initword;
+  std::string lemmaword;
+  while (lemmadic_file >> lemmaword >> initword)
+  {
+    lemmadic.insert(std::pair<std::string, std::string>(initword, lemmaword) );
+  }
+  lemmadic_file.close();
 }
 
 void Preprocessor::loadStopwords(std::string sw_filename)
@@ -125,15 +121,7 @@ void Preprocessor::tokenize(std::string &word)
 
 void Preprocessor::lemmatize(std::string &word)
 {
-  if (word.empty()) return;
-
-  const char* cstr_word = word.c_str();
-
-  // const char *cstr_word = word.c_str();
-  char* lemmatized_word = this->lemmatizer->Lemmatize(cstr_word);
-  std::cout << lemmatized_word << std::endl;
-  word = std::string(lemmatized_word);
-  delete[] lemmatized_word;
+  word = lemmadic[word];
 }
 
 void Preprocessor::preprocess() {
