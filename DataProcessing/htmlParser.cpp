@@ -28,7 +28,7 @@ void traverse_tree(myhtml_tree_t* tree, myhtml_tree_node_t *node, size_t inc, st
                 printf("%s", node_text);
         }
 
-        if(name != "style" and name != "annotation"){
+        if(name != "style" and name != "annotation" and name != "script"){
             traverse_tree(tree, myhtml_node_child(node), (inc + 1), text);
             node = myhtml_node_next(node);
         } else{
