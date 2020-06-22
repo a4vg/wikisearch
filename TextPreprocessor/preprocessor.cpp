@@ -1,32 +1,45 @@
 #include <iostream>
 #include <string>
+#include <cstring> // c_str
 #include <vector>
 #include <fstream> // ifstream, ofstream
 #include <sstream> // stringstream
 #include <cctype> // tolower
+#include "lemmagen/src/RdrLemmatizer.h" // lemmatizer
 
 class Preprocessor {
   std::string infilename;
   std::string outfilename;
   std::vector<std::string> stopwords;
+  RdrLemmatizer *lemmatizer = nullptr;
 
   bool isLetter(int c);
-  void loadStopwords(std::string stopwords_filename);
+  void loadLemmatizerDic(std::string lemmadic_filename);
+  void loadStopwords(std::string sw_filename);
   void removeStopword(std::string &word);
   void lowerStr(std::string &word);
   void tokenize(std::string &word);
+  void lemmatize(std::string &word);
 
   public:
-    Preprocessor(std::string _infilename, std::string _outfilename, std::string sw_filename="stopwords-es.txt");
+    Preprocessor
+    (std::string _infilename, std::string _outfilename, std::string sw_filename="stopwords/stopwords-es.txt", std::string lemmadic_filename="lemmagen/dictionaries/spanish.bin");
+    ~Preprocessor();
     void preprocess();
 };
 
 Preprocessor::Preprocessor
-(std::string _infilename, std::string _outfilename, std::string sw_filename):
+(std::string _infilename, std::string _outfilename, std::string sw_filename, std::string lemmadic_filename):
 infilename(_infilename), outfilename(_outfilename)
 {
   loadStopwords(sw_filename);
+  loadLemmatizerDic(lemmadic_filename);
 };
+
+Preprocessor::~Preprocessor()
+{
+  delete lemmatizer;
+}
 
 bool Preprocessor::isLetter(int c)
 {
@@ -34,12 +47,25 @@ bool Preprocessor::isLetter(int c)
   return (c<0) || ('a'<=c && c<='z') || ('A'<=c && c<='Z');
 }
 
+void Preprocessor::loadLemmatizerDic(std::string lemmadic_filename)
+{
+  // Check if file exists
+  std::ifstream infile(lemmadic_filename);
+  if (!infile.good()){
+    std::cout << "Can not open lemmagen dictionary";
+    throw "Can not open lemmagen dictionary";
+  }
+
+  // Load library
+  const char *cstr_filename = lemmadic_filename.c_str();
+  this->lemmatizer = new RdrLemmatizer(cstr_filename);
+}
+
 void Preprocessor::loadStopwords(std::string sw_filename)
 {
   std::ifstream sw_file(sw_filename);
-  if (!sw_file.is_open()){
+  if (!sw_file.is_open())
     throw "Can not open stopword file";
-  }
 
   std::string sw;
   while (getline(sw_file, sw))
@@ -97,6 +123,19 @@ void Preprocessor::tokenize(std::string &word)
   else word = "";
 }
 
+void Preprocessor::lemmatize(std::string &word)
+{
+  if (word.empty()) return;
+
+  const char* cstr_word = word.c_str();
+
+  // const char *cstr_word = word.c_str();
+  char* lemmatized_word = this->lemmatizer->Lemmatize(cstr_word);
+  std::cout << lemmatized_word << std::endl;
+  word = std::string(lemmatized_word);
+  delete[] lemmatized_word;
+}
+
 void Preprocessor::preprocess() {
   // Open files
   std::ifstream infile(this->infilename);
@@ -117,6 +156,7 @@ void Preprocessor::preprocess() {
       this->tokenize(word);
       this->lowerStr(word);
       this->removeStopword(word);
+      this->lemmatize(word);
 
       if (!word.empty())
         outfile << word << "\n";
@@ -130,6 +170,6 @@ void Preprocessor::preprocess() {
 
 int main()
 {
-  Preprocessor preprocessor("text-example.txt", "output.txt", "stopwords-es.txt");
+  Preprocessor preprocessor("text-example.txt", "output.txt");
   preprocessor.preprocess();
 }
