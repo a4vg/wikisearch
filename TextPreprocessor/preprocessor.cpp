@@ -24,7 +24,7 @@ class Preprocessor {
     {"Ó", "O"},
     {"Ú", "U"}
   };
-  
+
   bool isLetter(int c);
   bool hasTilde(int c);
 
@@ -173,24 +173,18 @@ void Preprocessor::preprocess() {
   if (!infile.is_open() || !outfile.is_open())
     throw "Can not open input or output file";
 
-  // Read infile
-  std::string line;
-  while(getline(infile, line))
+  // Read infile word by word
+  std::string word;
+  while(infile >> word)
   {
-    // Separate words in line
-    std::stringstream line_stream(line);
-    std::string word;
-    while (getline(line_stream, word, ' '))
-    {
-      this->tokenize(word);
-      this->lowerStr(word);
-      this->removeStopword(word);
-      this->lemmatize(word);
-      this->removeTilde(word);
+    this->tokenize(word);
+    this->lowerStr(word);
+    this->removeStopword(word);
+    this->lemmatize(word);
+    this->removeTilde(word);
 
-      if (!word.empty())
-        outfile << word << "\n";
-    }
+    if (!word.empty())
+      outfile << word << "\n";
   }
 
   // Close files
