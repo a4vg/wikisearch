@@ -6,7 +6,7 @@ ZimManager::ZimManager(const std::string& filename) {
 }
 
 ZimManager::iterator ZimManager::begin() {
-    iterator iter;
+    iterator iter(*this);
     iter.i = file.begin();
     while(iter.i->getLibraryMimeType() != ACCEPTED_MYMETYPE)
         iter.i++;
@@ -15,7 +15,7 @@ ZimManager::iterator ZimManager::begin() {
 }
 
 ZimManager::iterator ZimManager::end() {
-    iterator iter;
+    iterator iter(*this);
     iter.i = file.end();
     // iter.update_values();
     return iter;
@@ -23,9 +23,11 @@ ZimManager::iterator ZimManager::end() {
 
 ZimManager::iterator ZimManager::iterator::operator++() {
     i++;
-    while (i->getLibraryMimeType() != ACCEPTED_MYMETYPE)
+    while (i!=file.end() && i->getLibraryMimeType() != ACCEPTED_MYMETYPE)
         i++;
-    update_values();
+
+    if (i!=file.end())
+      update_values();
     return *this;
 }
 
@@ -35,14 +37,16 @@ bool ZimManager::iterator::operator!=(const ZimManager::iterator& it2) {
 
 void ZimManager::iterator::update_values() {
     value.first = i.getIndex();
-    value.second = i->getRedirectArticle().getData();
+    zim::Blob blob = i->getRedirectArticle().getData();
+    value.second = std::string(blob.data(), blob.size());
 }
 
 std::pair<int, std::string> ZimManager::iterator::operator*() {
     return this->value;
 }
 
-ZimManager::iterator::iterator() {
+ZimManagerIterator::ZimManagerIterator(ZimManager& z) {
     value.first = 0;
     value.second = "";
+    file = z.file;
 }

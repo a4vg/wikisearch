@@ -11,25 +11,28 @@
 
 #define ACCEPTED_MYMETYPE 65535
 
+class ZimManager;
+
+class ZimManagerIterator{
+    std::pair<int, std::string> value;
+    zim::File file;
+
+public:
+    ZimManagerIterator(ZimManager& z);
+    zim::File::const_iterator i;
+    ZimManagerIterator operator ++();
+    bool operator !=(const ZimManagerIterator& it2);
+    std::pair<int,std::string> operator *();
+    void update_values();
+};
+
 class ZimManager {
 
 public:
+    typedef ZimManagerIterator iterator;
 
     zim::File file;
     explicit ZimManager(const std::string&);
-
-    struct iterator{
-        iterator();
-
-        zim::File::const_iterator i;
-        iterator operator ++();
-        bool operator !=(const iterator& it2);
-        std::pair<int,std::string> operator *();
-        void update_values();
-
-    private:
-        std::pair<int, std::string> value;
-    };
 
     iterator begin();
     iterator end();
