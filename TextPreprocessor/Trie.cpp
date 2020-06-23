@@ -8,7 +8,11 @@ struct TrieNode {
   std::map<char, TrieNode<T>*> children;
 
   TrieNode(T _key): key(_key){};
-  ~TrieNode(){};
+  ~TrieNode()
+  {
+    for(auto it = children.begin(); it != children.end(); ++it)
+      delete it->second;
+  };
 };
 
 template <typename T>
@@ -19,6 +23,7 @@ class Trie {
   void getWords(TrieNode<T>* curnode, std::vector<std::string>& words, std::string prefix);
   public:
     Trie();
+    ~Trie();
     bool empty();
     int getTotalWords();
     bool exists(std::string word);
@@ -26,6 +31,12 @@ class Trie {
     T getKeyOf(std::string word);
     void getWords(std::vector<std::string>& words);
 };
+
+template <typename T>
+Trie<T>::~Trie()
+{
+  delete root;
+}
 
 template <typename T>
 Trie<T>::Trie():
