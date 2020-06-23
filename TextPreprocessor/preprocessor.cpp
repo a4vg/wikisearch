@@ -18,11 +18,13 @@ class Preprocessor {
     {"í", "i"},
     {"ó", "o"},
     {"ú", "u"},
+    {"ñ", "n"},
     {"Á", "A"},
     {"É", "E"},
     {"Í", "I"},
     {"Ó", "O"},
-    {"Ú", "U"}
+    {"Ú", "U"},
+    {"Ñ", "N"}
   };
 
   bool isLetter(int c);
@@ -30,8 +32,8 @@ class Preprocessor {
 
   void loadLemmatizerDic(std::string lemmadic_filename);
   void loadStopwords(std::string sw_filename);
-  void loadLemma(std::string lem_filename);
 
+  void removeNonAscii(std::string &word);
   void removeStopword(std::string &word);
   void lowerStr(std::string &word);
   void tokenize(std::string &word);
@@ -89,6 +91,16 @@ void Preprocessor::loadStopwords(std::string sw_filename)
   std::string sw;
   while (getline(sw_file, sw))
     this->stopwords.push_back(sw);
+}
+
+void Preprocessor::removeNonAscii(std::string &word)
+{
+  for (char &c: word)
+    if (!isalpha(c))
+    {
+      word = "";
+      return;
+    }
 }
 
 void Preprocessor::removeStopword(std::string &word)
@@ -153,6 +165,7 @@ void Preprocessor::lemmatize(std::string &word)
 
 void Preprocessor::removeTilde(std::string &word)
 {
+  if (word.empty()) return;
   for (int i=0; i<word.length(); ++i)
   {
     if (this->hasTilde(word[i]))
@@ -186,6 +199,7 @@ void Preprocessor::preprocess() {
     this->removeStopword(word);
     this->lemmatize(word);
     this->removeTilde(word);
+    this->removeNonAscii(word);
 
     if (!word.empty())
       outfile << word << "\n";
