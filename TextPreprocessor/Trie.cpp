@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 #include <map>
 
 template <typename T>
@@ -20,7 +21,7 @@ class Trie {
   TrieNode<T> *root;
   int nwords;
 
-  void getWords(TrieNode<T>* curnode, std::vector<std::string>& words, std::string prefix);
+  void getWords(TrieNode<T>* curnode, std::string prefix, std::vector<std::string>* pwords, std::ofstream* pfile=nullptr);
   public:
     Trie();
     ~Trie();
@@ -29,6 +30,7 @@ class Trie {
     bool insert(std::string word, T key);
     T getKeyOf(std::string word);
     void getWords(std::vector<std::string>& words);
+    void exportWords(std::string filename);
 };
 
 template <typename T>
@@ -87,23 +89,33 @@ T Trie<T>::getKeyOf(std::string word)
 }
 
 template <typename T>
-void Trie<T>::getWords(TrieNode<T>* curnode, std::vector<std::string>& words, std::string prefix)
+void Trie<T>::getWords(TrieNode<T>* curnode, std::string prefix, std::vector<std::string>* pwords, std::ofstream* pfile)
 {
-  if (curnode->key) // leaf
+  if (curnode->key!=T{}) // leaf
   {
-    words.push_back(prefix);
+    if (pwords) pwords->push_back(prefix);
+    if (pfile) *pfile << prefix << "\n";
     return;
   }
 
   for (const auto& pair : curnode->children)
     // pair.first = letter, pair.second = node
-    getWords(pair.second, words, prefix+pair.first);
+    getWords(pair.second, prefix+pair.first, pwords, pfile);
 }
 
 template <typename T>
 void Trie<T>::getWords(std::vector<std::string>& words)
 {
-  this->getWords(this->root, words, "");
+  std::vector<std::string>* pwords = &words;
+  this->getWords(this->root, "", pwords);
+}
+
+template <typename T>
+void Trie<T>::exportWords(std::string filename)
+{
+  std::ofstream file(filename);
+  std::ofstream* pfile = &file;
+  this->getWords(this->root, "", nullptr, pfile);
 }
 
 int main(){
@@ -135,4 +147,7 @@ int main(){
   std::cout << "\nlemmatizing:\n";
   for (auto& pair : words)
     std::cout << pair.first << " --> " << trie.getKeyOf(pair.first) << "\n";
+
+  // Export words to file
+  trie.exportWords("out-trie.txt");
 }
