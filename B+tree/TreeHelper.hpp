@@ -217,10 +217,46 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
 
     static void print (Data &header, diskManager &dm){
       std::cout << "\nPrint B+ Tree\n";
+      node_t temp = readNode(header.root_id, dm);
+      while (!temp.is_leaf)
+        temp = readNode(temp.children[0], dm);
+      
+      while (temp.next_node > 0){
+        for (int i = 0; i < temp.size; i++)
+          std::cout << temp.keys[i] << " - ";
+        temp = readNode(temp.next_node, dm);
+      }
+      for (int i = 0; i < temp.size; i++)
+        std::cout << temp.keys[i] << " - ";
+      std::cout<<"\n";
+    }
+
+    static int search (node_t &ptr, const T &val, diskManager &dm){
+      int pos = 0;
+      while (pos < ptr.size && ptr.keys[pos] <= val)
+        pos++;
+
+      if (!ptr.is_leaf){
+        long page_id = ptr.children [pos];
+        node_t child = readNode (page_id, dm);
+        return search (child, val, dm);
+      } else {
+        if (ptr.keys [pos - 1] != val){
+          return -1;
+        }else {
+          return 1;
+        }
+      }
     }
 
     static void search (const value_t &val, Data &header, diskManager &dm){
       std::cout << "Searching in B+tree\n";
+      node_t root = readNode(header.root_id, dm);
+      int res = search (root, val, dm);
+      if (res == -1)
+          std::cout << "Not found\n";
+      else
+          std::cout << "Found!\n";
     }
 
 };
