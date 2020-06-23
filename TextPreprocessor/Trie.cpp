@@ -117,37 +117,3 @@ void Trie<T>::exportWords(std::string filename)
   std::ofstream* pfile = &file;
   this->getWords(this->root, "", nullptr, pfile);
 }
-
-int main(){
-  std::map<std::string, std::string> words =
-  {
-    {"intitulaste", "intitular"}, 
-    {"intitulasteis", "intitular"}, 
-    {"intitule", "intitular"}, 
-    {"intitulé", "intitular"}, 
-    {"intituléis", "intitular"}, 
-    {"intitulemos", "intitular"}, 
-    {"intitulen", "intitular"}, 
-    {"intitules", "intitular"}, 
-    {"intitulo", "intitular"}, 
-    {"intituló", "intitular"}, 
-    {"intocables", "intocable"}, 
-    {"intolerabilidades", "intolerabilidad"},
-    {"intolerables", "intolerable"},
-    {"intolerancias", "intolerancia"},
-    {"intolerantes", "intolerante"}
-  };
-
-  Trie<std::string> trie;
-  int repeated_count = 0;
-  std::cout << "inserting words in vector\n";
-  for (auto& pair : words)
-    trie.insert(pair.first, pair.second);
-
-  std::cout << "\nlemmatizing:\n";
-  for (auto& pair : words)
-    std::cout << pair.first << " --> " << trie.getKeyOf(pair.first) << "\n";
-
-  // Export words to file
-  trie.exportWords("out-trie.txt");
-}

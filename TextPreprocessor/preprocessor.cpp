@@ -6,12 +6,13 @@
 #include <sstream> // stringstream
 #include <cctype> // tolower
 #include <map>
+#include "Trie.cpp"
 
 class Preprocessor {
   std::string infilename;
   std::string outfilename;
-  std::vector<std::string> stopwords;
-  std::map<std::string, std::string> lemmadic;
+  Trie<bool> stopwords;
+  Trie<std::string> lemmadic;
   std::map<std::string, std::string> withoutTilde = {
     {"á", "a"},
     {"é", "e"},
@@ -76,9 +77,7 @@ void Preprocessor::loadLemmatizerDic(std::string lem_filename)
   std::string initword;
   std::string lemmaword;
   while (lemmadic_file >> lemmaword >> initword)
-  {
-    lemmadic.insert(std::pair<std::string, std::string>(initword, lemmaword) );
-  }
+    this->lemmadic.insert(initword, lemmaword);
   lemmadic_file.close();
 }
 
@@ -89,8 +88,8 @@ void Preprocessor::loadStopwords(std::string sw_filename)
     throw "Can not open stopword file";
 
   std::string sw;
-  while (getline(sw_file, sw))
-    this->stopwords.push_back(sw);
+  while (sw_file >> sw)
+    this->stopwords.insert(sw, true);
 }
 
 void Preprocessor::removeNonAscii(std::string &word)
@@ -107,21 +106,8 @@ void Preprocessor::removeStopword(std::string &word)
 {
   if (word.empty()) return;
 
-  // Find word in stopwords with binary search
-  int low=0, high=this->stopwords.size();
-  while (low <= high)
-  {
-    int mid = (low+high)/2;
-    if (word == this->stopwords[mid]){
-      word = ""; // is a stopword, remove
-      return;
-    }
-    if (word.compare(this->stopwords[mid]) < 0) 
-      high = mid-1;
-    else
-      low = mid+1;
-  }
-  // is not a stopword
+  if (this->stopwords.getKeyOf(word))
+    word = ""; // is a stopword
 }
 
 void Preprocessor::lowerStr(std::string &word)
@@ -158,9 +144,10 @@ void Preprocessor::lemmatize(std::string &word)
 {
   if (word.empty()) return;
 
-  if (lemmadic.count(word) == 0)
-    return; // word not in map
-  word = lemmadic[word];
+  std::string lemmaword = this->lemmadic.getKeyOf(word);
+  if (!lemmaword.empty())
+    word = lemmaword;
+  // word not available
 }
 
 void Preprocessor::removeTilde(std::string &word)
