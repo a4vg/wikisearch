@@ -45,7 +45,7 @@ class Preprocessor {
     Preprocessor
     (std::string _infilename, std::string _outfilename, std::string sw_filename="stopwords/stopwords-es.txt", std::string lemmadic_filename="lemma-dictionaries/lemmatization-es.txt");
     ~Preprocessor(){};
-    void preprocess();
+    void preprocess(std::map<std::string, int>* pwordCount = nullptr);
 };
 
 Preprocessor::Preprocessor
@@ -169,7 +169,7 @@ void Preprocessor::removeTilde(std::string &word)
   }
 }
 
-void Preprocessor::preprocess() {
+void Preprocessor::preprocess(std::map<std::string, int>* pwordCount) {
   // Open files
   std::ifstream infile(this->infilename);
   std::ofstream outfile(this->outfilename);
@@ -189,7 +189,16 @@ void Preprocessor::preprocess() {
     this->removeNonAscii(word);
 
     if (!word.empty())
-      outfile << word << "\n";
+    {
+      if (pwordCount && !pwordCount->count(word))
+      {
+        (*pwordCount)[word] = 1;
+        outfile << word << "\n";
+      }
+      // repeated word
+      else if (pwordCount) (*pwordCount)[word] += 1;
+      else outfile << word << "\n";
+    }
   }
 
   // Close files
@@ -199,6 +208,14 @@ void Preprocessor::preprocess() {
 
 int main()
 {
+  std::map<std::string, int> wordCount;
+  std::map<std::string, int>* pwordCount = &wordCount;
   Preprocessor preprocessor("text-example.txt", "output.txt");
-  preprocessor.preprocess();
+  preprocessor.preprocess(pwordCount);
+
+  std::cout << "Word count:\n";
+  for (const auto& count: wordCount)
+    std::cout << count.first << ": " << count.second << "\n";
+
+
 }
