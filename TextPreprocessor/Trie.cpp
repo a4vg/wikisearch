@@ -26,7 +26,6 @@ class Trie {
     ~Trie();
     bool empty();
     int getTotalWords();
-    bool exists(std::string word);
     bool insert(std::string word, T key);
     T getKeyOf(std::string word);
     void getWords(std::vector<std::string>& words);
@@ -52,19 +51,6 @@ template <typename T>
 int Trie<T>::getTotalWords()
 {
   return nwords;
-}
-
-template <typename T>
-bool Trie<T>::exists(std::string word)
-{
-  TrieNode<T> *curnode = this->root;
-  for (const char& c: word)
-  {
-    if (!curnode->children.count(c))
-      return false;
-    curnode = curnode->children[c];
-  }
-  return true;
 }
 
 template <typename T>
