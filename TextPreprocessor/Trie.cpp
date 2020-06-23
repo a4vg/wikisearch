@@ -23,6 +23,7 @@ class Trie {
     int getTotalWords();
     bool exists(std::string word);
     bool insert(std::string word, T key);
+    T getKeyOf(std::string word);
     void getWords(std::vector<std::string>& words);
 };
 
@@ -68,11 +69,24 @@ bool Trie<T>::insert(std::string word, T key)
   
   // Set key in last character to mark end of word
   // only if the key is empty
-  if (curnode->key)
+  if (curnode->key!=T{})
     return false; // word exists
   curnode->key = key;
   ++nwords;
   return true; // word inserted
+}
+
+template <typename T>
+T Trie<T>::getKeyOf(std::string word)
+{
+  TrieNode<T> *curnode = this->root;
+  for (const char& c: word)
+  {
+    if (!curnode->children.count(c))
+      return T{};
+    curnode = curnode->children[c];
+  }
+  return curnode->key;
 }
 
 template <typename T>
@@ -96,40 +110,32 @@ void Trie<T>::getWords(std::vector<std::string>& words)
 }
 
 int main(){
-  std::vector<std::string> words =
+  std::map<std::string, std::string> words =
   {
-    "wikipedia",
-    "espanol",
-    "edicion",
-    "espanol",
-    "wikipedia",
-    "igual",
-    "version",
-    "wikipedia",
-    "existir",
-    "idioma",
-    "enciclopedia"
+    {"intitulaste", "intitular"}, 
+    {"intitulasteis", "intitular"}, 
+    {"intitule", "intitular"}, 
+    {"intitulé", "intitular"}, 
+    {"intituléis", "intitular"}, 
+    {"intitulemos", "intitular"}, 
+    {"intitulen", "intitular"}, 
+    {"intitules", "intitular"}, 
+    {"intitulo", "intitular"}, 
+    {"intituló", "intitular"}, 
+    {"intocables", "intocable"}, 
+    {"intolerabilidades", "intolerabilidad"},
+    {"intolerables", "intolerable"},
+    {"intolerancias", "intolerancia"},
+    {"intolerantes", "intolerante"}
   };
 
-  Trie<bool> trie;
+  Trie<std::string> trie;
   int repeated_count = 0;
-  std::cout << "inserting words in vector:\n";
-  for (auto& word : words)
-  {
-    bool repeated = !trie.insert(word, true);
-    std::cout << word;
-    if (repeated){
-      ++repeated_count;
-      std::cout << " - Repeated!";
-    }
-    std::cout << "\n";
-  }
+  std::cout << "inserting words in vector\n";
+  for (auto& pair : words)
+    trie.insert(pair.first, pair.second);
 
-  std::vector<std::string> words_trie;
-  trie.getWords(words_trie);
-  std::cout << "\ntotal words inserted: " << trie.getTotalWords() << "\n";
-  std::cout << repeated_count << " repeated words\n";
-  std::cout << "words in trie:\n";
-  for (auto& word : words_trie)
-    std::cout << word << "\n";
+  std::cout << "\nlemmatizing:\n";
+  for (auto& pair : words)
+    std::cout << pair.first << " --> " << trie.getKeyOf(pair.first) << "\n";
 }
