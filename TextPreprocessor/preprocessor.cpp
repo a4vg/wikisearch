@@ -1,21 +1,21 @@
 #include <iostream>
-#include <string>
 #include <cstring> // c_str
-#include <vector>
 #include <fstream> // ifstream, ofstream
 #include <sstream> // stringstream
 #include <cctype> // tolower
+#include <string>
+#include <vector>
 #include <map>
+
 #include "Trie.cpp"
 
 class Preprocessor {
-  std::string infilename;
-  std::string outfilename;
   std::string text;
-  Trie<bool> stopwords;
-  Trie<std::string> lemmadic;
   std::map<std::string, int> wordCount;
   bool isPreprocessed = false;
+
+  Trie<bool> stopwords;
+  Trie<std::string> lemmadic;
   std::map<std::string, std::string> withoutTilde = {
     {"á", "a"},
     {"é", "e"},
@@ -243,4 +243,5 @@ int main()
   wordCount = preprocessor.getWordCount();
   for (const auto& count: wordCount)
     std::cout << count.first << ": " << count.second << "\n";
+  preprocessor.exportWordCount("output.txt");
 }
