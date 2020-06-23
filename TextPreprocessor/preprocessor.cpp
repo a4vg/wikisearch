@@ -11,8 +11,11 @@
 class Preprocessor {
   std::string infilename;
   std::string outfilename;
+  std::string text;
   Trie<bool> stopwords;
   Trie<std::string> lemmadic;
+  std::map<std::string, int> wordCount;
+  bool isPreprocessed = false;
   std::map<std::string, std::string> withoutTilde = {
     {"á", "a"},
     {"é", "e"},
@@ -43,14 +46,16 @@ class Preprocessor {
 
   public:
     Preprocessor
-    (std::string _infilename, std::string _outfilename, std::string sw_filename="stopwords/stopwords-es.txt", std::string lemmadic_filename="lemma-dictionaries/lemmatization-es.txt");
+    (std::string _text="", std::string sw_filename="stopwords/stopwords-es.txt", std::string lemmadic_filename="lemma-dictionaries/lemmatization-es.txt");
     ~Preprocessor(){};
-    void preprocess(std::map<std::string, int>* pwordCount = nullptr);
+    void setText(std::string _text);
+    std::map<std::string, int> getWordCount();
+    void exportWordCount(std::string filename);
+    void preprocess();
 };
 
 Preprocessor::Preprocessor
-(std::string _infilename, std::string _outfilename, std::string sw_filename, std::string lemmadic_filename):
-infilename(_infilename), outfilename(_outfilename)
+(std::string _text, std::string sw_filename, std::string lemmadic_filename): text(_text)
 {
   loadStopwords(sw_filename);
   loadLemmatizerDic(lemmadic_filename);
@@ -169,53 +174,73 @@ void Preprocessor::removeTilde(std::string &word)
   }
 }
 
-void Preprocessor::preprocess(std::map<std::string, int>* pwordCount) {
-  // Open files
-  std::ifstream infile(this->infilename);
-  std::ofstream outfile(this->outfilename);
+void Preprocessor::setText(std::string _text)
+{
+  this->text = _text;
+  this->isPreprocessed = false;
+  this->wordCount.clear();
+}
 
-  if (!infile.is_open() || !outfile.is_open())
-    throw "Can not open input or output file";
+std::map<std::string, int> Preprocessor::getWordCount()
+{
+  if (!this->isPreprocessed)
+    this->preprocess();
+  return this->wordCount;
+}
 
+void Preprocessor::exportWordCount(std::string filename)
+{
+  if (!this->isPreprocessed)
+    this->preprocess();
+
+  std::ofstream outfile(filename);
+  for (const auto& pair: this->wordCount)
+    // pair.first = string, pair.second = int
+    outfile << pair.first << " " << pair.second;
+}
+
+void Preprocessor::preprocess()
+{
   // Read infile word by word
+  std::stringstream stream(this->text);
   std::string word;
-  while(infile >> word)
+  while(stream >> word)
   {
     this->tokenize(word);
     this->lowerStr(word);
-    this->removeStopword(word);
     this->lemmatize(word);
+    this->removeStopword(word);
     this->removeTilde(word);
     this->removeNonAscii(word);
 
     if (!word.empty())
     {
-      if (pwordCount && !pwordCount->count(word))
-      {
-        (*pwordCount)[word] = 1;
-        outfile << word << "\n";
-      }
-      // repeated word
-      else if (pwordCount) (*pwordCount)[word] += 1;
-      else outfile << word << "\n";
+      if (!this->wordCount.count(word))
+        this->wordCount[word] = 1;
+      else // repeated word
+        this->wordCount[word] += 1;
     }
   }
-
-  // Close files
-  infile.close();
-  outfile.close();
+  this->isPreprocessed = true;
 }
 
 int main()
 {
-  std::map<std::string, int> wordCount;
-  std::map<std::string, int>* pwordCount = &wordCount;
-  Preprocessor preprocessor("text-example.txt", "output.txt");
-  preprocessor.preprocess(pwordCount);
+  std::string text1 = "Wikipedia en español es la edición en español de Wikipedia. Al igual que las versiones de Wikipedia que existen en otros idiomas, es una enciclopedia de contenido libre, publicada en Internet bajo las licencias libres CC BY-SA 3.0 y GFDL. En la actualidad cuenta con 1 606 871 artículos, y es escrita por usuarios voluntarios, es decir, que cualquiera puede editar un artículo, corregirlo o ampliarlo. Los servidores son administrados por la Fundación Wikimedia, una organización sin ánimo de lucro cuya financiación se basa fundamentalmente en donaciones.";
+  std::string text2 = "Es por ello que este artículo tiene la intención de enseñaros a redactar un texto argumentativo desde el principio para que podáis aplicarlo posteriormente sin tener en cuenta la tesis que vayáis a defender. Si conseguimos que previamente a la redacción el alumno tenga por escrito un guión previo muy definido, la redacción será mucho más fácil. En este sentido el profesor es importante que no sólo valore el texto argumentativo, sino también el borrador o plantilla elaborada por el alumno.";
+  
+  std::cout << "Loading language files to preprocessor...\n";
+  Preprocessor preprocessor(text1); // text can also be set with .setText(string)
 
-  std::cout << "Word count:\n";
+  std::cout << "\nWord count for text 1:\n";
+  auto wordCount = preprocessor.getWordCount();
   for (const auto& count: wordCount)
     std::cout << count.first << ": " << count.second << "\n";
 
+  preprocessor.setText(text2);
 
+  std::cout << "\nWord count for text 2:\n";
+  wordCount = preprocessor.getWordCount();
+  for (const auto& count: wordCount)
+    std::cout << count.first << ": " << count.second << "\n";
 }
