@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sstream>
 #include <iostream>
 #include <myhtml/api.h>
 #include <fstream>
 #include "htmlParser.h"
 
 using namespace std;
-
-
 
 void traverse_tree(myhtml_tree_t* tree, myhtml_tree_node_t *node, size_t inc, string &text)
 {
@@ -24,8 +23,10 @@ void traverse_tree(myhtml_tree_t* tree, myhtml_tree_node_t *node, size_t inc, st
 
         if(tag_id == MyHTML_TAG__TEXT ) {
                 const char* node_text = myhtml_node_text(node, NULL);
-             //   text.append(node_text);
-                printf("%s", node_text);
+                std::istringstream iss(node_text);
+                std::string tmp_str;
+                while(iss>>tmp_str)
+                    text += tmp_str + ' ';
         }
 
         if(name != "style" and name != "annotation" and name != "script"){
@@ -44,7 +45,7 @@ string parse_html(string html_s){
     char html[size];
     strcpy(html,html_s.c_str());
 
-    string parsed_text ="";
+    string parsed_text;
 
     // basic init
     myhtml_t* myhtml = myhtml_create();

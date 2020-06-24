@@ -38,7 +38,10 @@ bool ZimManager::iterator::operator!=(const ZimManager::iterator& it2) {
 void ZimManager::iterator::update_values() {
     value.first = i.getIndex();
     zim::Blob blob = i->getRedirectArticle().getData();
-    value.second = std::string(blob.data(), blob.size());
+    std::string str_html = std::string(blob.data(), blob.size());
+    const char* zptr = str_html.c_str();
+    std::string h(zptr);
+    value.second = parse_html(h);
 }
 
 std::pair<int, std::string> ZimManager::iterator::operator*() {

@@ -8,6 +8,7 @@ include_directories(DataProcessing)
 add_executable(cs3102_trabajofinal_covid_20
         DataProcessing/zimInterface.cpp
         DataProcessing/ZimManager.cpp
+        DataProcessing/htmlParser.cpp
         )
 
-target_link_libraries(cs3102_trabajofinal_covid_20 zim)
+target_link_libraries(cs3102_trabajofinal_covid_20 zim myhtml)

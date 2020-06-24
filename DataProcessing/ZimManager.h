@@ -7,7 +7,7 @@
 
 #include <zim/file.h>
 #include <zim/fileiterator.h>
-#include <zim/fileimpl.h>
+#include "htmlParser.h"
 
 #define ACCEPTED_MYMETYPE 65535
 
