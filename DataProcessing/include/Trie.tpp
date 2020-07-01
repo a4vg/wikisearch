@@ -1,37 +1,7 @@
-#include <iostream>
-#include <vector>
+#ifndef TRIE_CPP
+#define TRIE_CPP
+
 #include <fstream>
-#include <map>
-
-template <typename T>
-struct TrieNode {
-  T key;
-  std::map<char, TrieNode<T>*> children;
-
-  TrieNode(T _key): key(_key){};
-  ~TrieNode()
-  {
-    for(auto it = children.begin(); it != children.end(); ++it)
-      delete it->second;
-  };
-};
-
-template <typename T>
-class Trie {
-  TrieNode<T> *root;
-  int nwords;
-
-  void getWords(TrieNode<T>* curnode, std::string prefix, std::vector<std::string>* pwords, std::ofstream* pfile=nullptr);
-  public:
-    Trie();
-    ~Trie();
-    bool empty();
-    int getTotalWords();
-    bool insert(std::string word, T key);
-    T getKeyOf(std::string word);
-    void getWords(std::vector<std::string>& words);
-    void exportWords(std::string filename);
-};
 
 template <typename T>
 Trie<T>::~Trie()
@@ -117,3 +87,5 @@ void Trie<T>::exportWords(std::string filename)
   std::ofstream* pfile = &file;
   this->getWords(this->root, "", nullptr, pfile);
 }
+
+#endif

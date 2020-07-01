@@ -1,3 +1,6 @@
+#ifndef ZIMMANAGER_CPP
+#define ZIMMANAGER_CPP
+
 #include "ZimManager.h"
 
 ZimManager::ZimManager(const std::string& filename) {
@@ -50,3 +53,5 @@ ZimManagerIterator::ZimManagerIterator(ZimManager& z) {
     value.second = "";
     file = z.file;
 }
+
+#endif

@@ -1,62 +1,23 @@
-#include <iostream>
+#ifndef PREPROCESSOR_CPP
+#define PREPROCESSOR_CPP
+
+#include "Preprocessor.h"
+
+#include <sstream> // stringstream
 #include <cstring> // c_str
 #include <fstream> // ifstream, ofstream
-#include <sstream> // stringstream
 #include <cctype> // tolower
-#include <string>
 #include <vector>
-#include <map>
-
-#include "Trie.cpp"
-
-class Preprocessor {
-  std::string text;
-  std::map<std::string, int> wordCount;
-  bool isPreprocessed = false;
-
-  Trie<bool> stopwords;
-  Trie<std::string> lemmadic;
-  std::map<std::string, std::string> withoutTilde = {
-    {"á", "a"},
-    {"é", "e"},
-    {"í", "i"},
-    {"ó", "o"},
-    {"ú", "u"},
-    {"ñ", "n"},
-    {"Á", "A"},
-    {"É", "E"},
-    {"Í", "I"},
-    {"Ó", "O"},
-    {"Ú", "U"},
-    {"Ñ", "N"}
-  };
-
-  bool isLetter(int c);
-  bool hasTilde(int c);
-
-  void loadLemmatizerDic(std::string lemmadic_filename);
-  void loadStopwords(std::string sw_filename);
-
-  void removeNonAscii(std::string &word);
-  void removeStopword(std::string &word);
-  void lowerStr(std::string &word);
-  void tokenize(std::string &word);
-  void lemmatize(std::string &word);
-  void removeTilde(std::string &word);
-
-  public:
-    Preprocessor
-    (std::string _text="", std::string sw_filename="stopwords/stopwords-es.txt", std::string lemmadic_filename="lemma-dictionaries/lemmatization-es.txt");
-    ~Preprocessor(){};
-    void setText(std::string _text);
-    std::map<std::string, int> getWordCount();
-    void exportWordCount(std::string filename);
-    void preprocess();
-};
+#include <cstdlib> // getenv
 
 Preprocessor::Preprocessor
 (std::string _text, std::string sw_filename, std::string lemmadic_filename): text(_text)
 {
+  std::string data_dir(std::getenv("DATA_DIR"));
+  if (sw_filename.empty())
+    sw_filename = data_dir + "stopwords/stopwords-es.txt";
+  if (lemmadic_filename.empty())
+    lemmadic_filename = data_dir + "lemma-dictionaries/lemmatization-es.txt";
   loadStopwords(sw_filename);
   loadLemmatizerDic(lemmadic_filename);
 };
@@ -196,7 +157,7 @@ void Preprocessor::exportWordCount(std::string filename)
   std::ofstream outfile(filename);
   for (const auto& pair: this->wordCount)
     // pair.first = string, pair.second = int
-    outfile << pair.first << " " << pair.second;
+    outfile << pair.first << " " << pair.second << "\n";
 }
 
 void Preprocessor::preprocess()
@@ -224,24 +185,4 @@ void Preprocessor::preprocess()
   this->isPreprocessed = true;
 }
 
-int main()
-{
-  std::string text1 = "Wikipedia en español es la edición en español de Wikipedia. Al igual que las versiones de Wikipedia que existen en otros idiomas, es una enciclopedia de contenido libre, publicada en Internet bajo las licencias libres CC BY-SA 3.0 y GFDL. En la actualidad cuenta con 1 606 871 artículos, y es escrita por usuarios voluntarios, es decir, que cualquiera puede editar un artículo, corregirlo o ampliarlo. Los servidores son administrados por la Fundación Wikimedia, una organización sin ánimo de lucro cuya financiación se basa fundamentalmente en donaciones.";
-  std::string text2 = "Es por ello que este artículo tiene la intención de enseñaros a redactar un texto argumentativo desde el principio para que podáis aplicarlo posteriormente sin tener en cuenta la tesis que vayáis a defender. Si conseguimos que previamente a la redacción el alumno tenga por escrito un guión previo muy definido, la redacción será mucho más fácil. En este sentido el profesor es importante que no sólo valore el texto argumentativo, sino también el borrador o plantilla elaborada por el alumno.";
-  
-  std::cout << "Loading language files to preprocessor...\n";
-  Preprocessor preprocessor(text1); // text can also be set with .setText(string)
-
-  std::cout << "\nWord count for text 1:\n";
-  auto wordCount = preprocessor.getWordCount();
-  for (const auto& count: wordCount)
-    std::cout << count.first << ": " << count.second << "\n";
-
-  preprocessor.setText(text2);
-
-  std::cout << "\nWord count for text 2:\n";
-  wordCount = preprocessor.getWordCount();
-  for (const auto& count: wordCount)
-    std::cout << count.first << ": " << count.second << "\n";
-  preprocessor.exportWordCount("output.txt");
-}
+#endif

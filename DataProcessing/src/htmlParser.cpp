@@ -1,3 +1,6 @@
+#ifndef HTMLPARSER_CPP
+#define HTMLPARSER_CPP
+
 #include <myhtml/api.h>
 #include <vector>
 
@@ -80,4 +83,4 @@ std::string parseWikipediaHTML(char const* html, int html_size)
     return text;
 }
 
-
+#endif
