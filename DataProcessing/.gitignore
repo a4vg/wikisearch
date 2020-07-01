@@ -1,0 +1,15 @@
+# Files without extension (must go first)
+*
+!*.*
+!*/
+!Makefile
+
+# Clion
+cmake-build-*/
+.idea/
+
+# Large data
+wiki-full.zim
+
+# System
+.DS_Store
