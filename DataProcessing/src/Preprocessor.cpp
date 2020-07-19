@@ -9,15 +9,22 @@
 #include <cctype> // tolower
 #include <vector>
 #include <cstdlib> // getenv
+#include <iostream> // cerr
 
 Preprocessor::Preprocessor
 (std::string _text, std::string sw_filename, std::string lemmadic_filename): text(_text)
 {
-  std::string data_dir(std::getenv("DATA_DIR"));
+  const char *data_dir = std::getenv("DATA_DIR");
+  if ((sw_filename.empty() || lemmadic_filename.empty()) && !data_dir)
+  {
+    std::cerr << "Please, set the env variable 'DATA_DIR' or provide a path for stopwords and lemmatization files.\nex: export DATA_DIR=./data";
+    exit(1);
+  }
+
   if (sw_filename.empty())
-    sw_filename = data_dir + "stopwords/stopwords-es.txt";
+    sw_filename = std::string(data_dir) + "/stopwords/stopwords-es.txt";
   if (lemmadic_filename.empty())
-    lemmadic_filename = data_dir + "lemma-dictionaries/lemmatization-es.txt";
+    lemmadic_filename = std::string(data_dir) + "/lemma-dictionaries/lemmatization-es.txt";
   loadStopwords(sw_filename);
   loadLemmatizerDic(lemmadic_filename);
 };
@@ -38,6 +45,9 @@ bool Preprocessor::hasTilde(int c)
 void Preprocessor::loadLemmatizerDic(std::string lem_filename)
 {
   std::ifstream lemmadic_file(lem_filename);
+  if (!lemmadic_file.is_open())
+    throw "Can not open lemmatizer file: " + lem_filename;
+
   std::string line;
 
   std::string initword;
@@ -51,7 +61,7 @@ void Preprocessor::loadStopwords(std::string sw_filename)
 {
   std::ifstream sw_file(sw_filename);
   if (!sw_file.is_open())
-    throw "Can not open stopword file";
+    throw "Can not open stopword file: " + sw_filename;
 
   std::string sw;
   while (sw_file >> sw)
