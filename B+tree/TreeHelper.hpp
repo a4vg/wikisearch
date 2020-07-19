@@ -68,6 +68,7 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
         iter_child = 0;
 
         if (ptr_node.is_leaf) {
+            right_node.children[iter_child] = ptr_node.children[iter_keys];
             right_node.keys[iter_child] = ptr_node.keys[iter_keys];
             right_node.size++;
             iter_child++;
@@ -141,6 +142,7 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
         iter_child = 0;
 
         if (ptr_node.is_leaf){ //if is the first split of the root node
+            right_node.children[iter_child] = ptr_node.children[iter_keys];
             right_node.keys[iter_child] = ptr_node.keys[iter_keys]; //left base split
             right_node.size++;
             iter_child++;
@@ -179,7 +181,7 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
 
     
 
-    static int insert (node_t &node, const value_t& val, Data &header, diskManager &dm){
+    static int insert (node_t &node, const value_t& val, long idpage, Data &header, diskManager &dm){
         int pos = 0;
         while (pos < node.size && node.keys[pos] < val)
             pos++;
@@ -187,17 +189,17 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
         if (node.is_leaf){
             for(int i = node.size; i > pos; i--){
                 node.keys[i] = node.keys[i - 1];
-                node.children[i + 1] = node.children[i];
+                node.children[i] = node.children[i - 1];
             }
             node.keys[pos] = val;
-            node.children[pos + 1] = node.children [pos];
+            node.children[pos] = idpage;
             node.size += 1;
 
             writeNode (node.disk_id, node, dm);
         } else {
             long page_id = node.children[pos];
             node_t child = readNode(page_id, dm);
-            int state = insert(child, val, header, dm);
+            int state = insert(child, val, idpage, header, dm);
             if (state == OVERFLOW){
                 splitNode(node, pos, header, dm);
             }
@@ -206,10 +208,10 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
         return node.isOverflow() ? OVERFLOW : NORMAL;
     }
 
-    static void insert (const value_t& val, Data &header, diskManager &dm){
+    static void insert (const value_t& val, long idpage, Data &header, diskManager &dm){
       std::cout << "Inserting " << val << std::endl;
       node_t root = readNode (header.root_id, dm);
-      int state = insert(root, val, header, dm);
+      int state = insert(root, val, idpage, header, dm);
       if (state == OVERFLOW){
         splitRoot (header, dm);
       }
@@ -222,12 +224,14 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
         temp = readNode(temp.children[0], dm);
       
       while (temp.next_node > 0){
+        std::cout << "Node: ";
         for (int i = 0; i < temp.size; i++)
-          std::cout << temp.keys[i] << " - ";
+          std::cout << temp.keys[i] << ":" << temp.children[i] << " - ";
         temp = readNode(temp.next_node, dm);
       }
+      std::cout << "Node: ";
       for (int i = 0; i < temp.size; i++)
-        std::cout << temp.keys[i] << " - ";
+        std::cout << temp.keys[i] << ":" << temp.children[i] << " - ";
       std::cout<<"\n";
     }
 
@@ -244,7 +248,7 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
         if (ptr.keys [pos - 1] != val){
           return -1;
         }else {
-          return 1;
+          return ptr.children [pos - 1];
         }
       }
     }
@@ -256,7 +260,7 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
       if (res == -1)
           std::cout << "Not found\n";
       else
-          std::cout << "Found!\n";
+          std::cout << "Found: " << res << "\n";
     }
 
 };
