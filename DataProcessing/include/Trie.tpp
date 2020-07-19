@@ -93,8 +93,9 @@ json Trie<T>::toJson(TrieNode<T>* curnode)
 {
   json jsonSubtrie = { {"end", curnode->key!=T{}} };
   for (const auto& pair : curnode->children)
-    if (pair.second)
+    if (pair.second && isalpha(pair.first)){
       jsonSubtrie[std::string(1, pair.first)] = this->toJson(pair.second);
+    }
   return jsonSubtrie;
 }
 
