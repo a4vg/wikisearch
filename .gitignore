@@ -1,6 +1,16 @@
+# Ignore executables (without extension)
+*
+!*.*
+!*/
+!Makefile
+
+.DS_Store
+
 .idea/
 cmake-build-debug/
 res/
 
 node_modules/
 dist/
+
+build/

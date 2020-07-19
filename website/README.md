@@ -14,3 +14,14 @@ npm run start
 
 ## Requirements
 * npm
+* Crow dependencies
+From [mrozigor/crow](https://github.com/mrozigor/crow#installing-missing-dependencies) forked from the original [crow](https://github.com/ipkn/crow)
+
+**Ubuntu**
+```
+sudo apt-get install build-essential libtcmalloc-minimal4 && sudo ln -s /usr/lib/libtcmalloc_minimal.so.4 /usr/lib/libtcmalloc_minimal.so
+```
+**OSX**
+```
+brew install boost google-perftools
+```
