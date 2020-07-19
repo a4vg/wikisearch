@@ -28,7 +28,7 @@ class Trie
   int nwords;
 
   void getWords(TrieNode<T>* curnode, std::string prefix, std::vector<std::string>* pwords, std::ofstream* pfile=nullptr);
-  json toJson(TrieNode<T>* curnode);
+  json toJson(TrieNode<T>* curnode, bool lower);
   public:
     Trie();
     ~Trie();
@@ -38,8 +38,8 @@ class Trie
     T getKeyOf(std::string word);
     void getWords(std::vector<std::string>& words);
     void exportWords(std::string filename);
-    void toJson(json &jsonTrie);
-    void exportAsJson(std::string filename);
+    void toJson(json &jsonTrie, bool lower=true);
+    void exportAsJson(std::string filename, bool lower=true);
 };
 
 #include "Trie.tpp"

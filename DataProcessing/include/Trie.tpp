@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <cctype> // tolower
 
 template <typename T>
 Trie<T>::~Trie()
@@ -89,27 +90,29 @@ void Trie<T>::exportWords(std::string filename)
 }
 
 template <typename T>
-json Trie<T>::toJson(TrieNode<T>* curnode)
+json Trie<T>::toJson(TrieNode<T>* curnode, bool lower)
 {
   json jsonSubtrie = { {"end", curnode->key!=T{}} };
   for (const auto& pair : curnode->children)
     if (pair.second && isalpha(pair.first)){
-      jsonSubtrie[std::string(1, pair.first)] = this->toJson(pair.second);
+      char c = pair.first;
+      if (lower) c = tolower(c);
+      jsonSubtrie[std::string(1, c)] = this->toJson(pair.second, lower);
     }
   return jsonSubtrie;
 }
 
 template <typename T>
-void Trie<T>::toJson(json &jsonTrie)
+void Trie<T>::toJson(json &jsonTrie, bool lower)
 {
-  jsonTrie = this->toJson(this->root);
+  jsonTrie = this->toJson(this->root, lower);
 }
 
 template <typename T>
-void Trie<T>::exportAsJson(std::string filename)
+void Trie<T>::exportAsJson(std::string filename, bool lower)
 {
   std::ofstream file(filename);
-  file << this->toJson(this->root);
+  file << this->toJson(this->root, lower);
 }
 
 #endif
