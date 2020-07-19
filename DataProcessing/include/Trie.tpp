@@ -61,11 +61,10 @@ T Trie<T>::getKeyOf(std::string word)
 template <typename T>
 void Trie<T>::getWords(TrieNode<T>* curnode, std::string prefix, std::vector<std::string>* pwords, std::ofstream* pfile)
 {
-  if (curnode->key!=T{}) // leaf
+  if (curnode->key!=T{}) // end of word
   {
     if (pwords) pwords->push_back(prefix);
     if (pfile) *pfile << prefix << "\n";
-    return;
   }
 
   for (const auto& pair : curnode->children)
