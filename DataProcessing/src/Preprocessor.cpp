@@ -11,17 +11,29 @@
 #include <cstdlib> // getenv
 
 std::map<std::string, std::string> Preprocessor::withoutTilde = {
+    {"ä", "a"},
     {"á", "a"},
     {"é", "e"},
+    {"ë", "e"},
     {"í", "i"},
+    {"ï", "i"},
     {"ó", "o"},
+    {"ö", "o"},
     {"ú", "u"},
+    {"ü", "u"},
     {"ñ", "n"},
     {"Á", "A"},
+    {"Å", "A"},
+    {"Ă", "A"},
+    {"Ä", "A"},
     {"É", "E"},
+    {"Ë", "E"},
     {"Í", "I"},
+    {"Ï", "I"},
     {"Ó", "O"},
+    {"Ö", "O"},
     {"Ú", "U"},
+    {"Ü", "U"},
     {"Ñ", "N"}
   };
 
@@ -145,7 +157,7 @@ void Preprocessor::removeTilde(std::string &word)
       newword += Preprocessor::withoutTilde[word.substr(i, 2)];
       newword += word.substr(i+2, word.length()-i-2);
       word = newword;
-      break; // assumes there's just one tilde 
+      // break; // uncomment to assume there's just one tilde 
     }
   }
 }
