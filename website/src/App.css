@@ -1,0 +1,124 @@
+:root {
+  --searchbox-height: 3rem;
+  --searchbox-width: 60%;
+}
+
+body {
+  margin: 0;
+  background-color: #fcfcfc;
+}
+
+/*********************
+ * Searchbar section *
+ *********************/
+.searchbar {
+  position: relative;
+  display: block;
+  height: 20%;
+  padding: 2em;
+  background-color: #f5f5f5;
+  white-space: nowrap;
+}
+
+.searchbar img {
+  height: 5rem;
+  vertical-align: middle;
+  margin: 0px 1em;
+}
+
+/*
+ * Searchbox
+ */
+.searchbox {
+  position: relative;
+  display: inline-block;
+  height: var(--searchbox-height);
+  width: var(--searchbox-width);
+  min-width: 15rem;
+  border-radius: 25px;
+  white-space: nowrap;
+  box-shadow: 0 0 10px #ccc;
+}
+
+.searchbox input, .searchbox button {
+  height: 100%;
+  box-sizing: border-box;
+  vertical-align: middle;
+  border: none;
+}
+
+/*
+ * Search input
+ */
+.searchbox input {
+  font-family: 'Roboto';
+  font-weight: 300;
+  padding: 1em;
+  font-size: 1rem;
+  width: calc(100% - 5rem);
+  min-width: 10rem;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.searchbox input:focus {
+  outline: none;
+}
+
+/*
+ * Search button
+ */
+.searchbox button {
+  width: 5rem;
+  background-color: #fff;
+  transition: 0.3s;
+  cursor: pointer;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.searchbox button:hover {
+  background-color: #63AE56;
+}
+
+/*
+ * Search button icon
+ */
+.searchbox button svg {
+  width: 2rem;
+  height: 2rem;
+  transition: 0.3s;
+  fill: #aaa;
+}
+
+.searchbox button:hover svg path {
+  fill: #fff;
+}
+
+/*
+ * Autocomplete
+ */
+.searchbox-autocomplete {
+  position: absolute;
+  margin-top: -0.3rem;
+  width: calc(100% - 5rem); /* Same as text input */
+  box-sizing: border-box;
+  font-family: 'Roboto';
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  background-color: #fff;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  box-shadow: 0 5px 10px #eee;
+}
+
+.searchbox-autocomplete div {
+  padding: 0.3em 1em;
+  /*transition: 0.2s;*/
+  cursor: pointer;
+}
+
+.searchbox-autocomplete div:hover {
+  background-color: #eee;
+}
