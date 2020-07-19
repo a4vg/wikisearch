@@ -2,6 +2,7 @@
 #define TRIE_CPP
 
 #include <fstream>
+#include <string>
 
 template <typename T>
 Trie<T>::~Trie()
@@ -61,11 +62,10 @@ T Trie<T>::getKeyOf(std::string word)
 template <typename T>
 void Trie<T>::getWords(TrieNode<T>* curnode, std::string prefix, std::vector<std::string>* pwords, std::ofstream* pfile)
 {
-  if (curnode->key!=T{}) // leaf
+  if (curnode->key!=T{}) // end of word
   {
     if (pwords) pwords->push_back(prefix);
     if (pfile) *pfile << prefix << "\n";
-    return;
   }
 
   for (const auto& pair : curnode->children)
@@ -86,6 +86,29 @@ void Trie<T>::exportWords(std::string filename)
   std::ofstream file(filename);
   std::ofstream* pfile = &file;
   this->getWords(this->root, "", nullptr, pfile);
+}
+
+template <typename T>
+json Trie<T>::toJson(TrieNode<T>* curnode)
+{
+  json jsonSubtrie = { {"end", curnode->key!=T{}} };
+  for (const auto& pair : curnode->children)
+    if (pair.second)
+      jsonSubtrie[std::string(1, pair.first)] = this->toJson(pair.second);
+  return jsonSubtrie;
+}
+
+template <typename T>
+void Trie<T>::toJson(json &jsonTrie)
+{
+  jsonTrie = this->toJson(this->root);
+}
+
+template <typename T>
+void Trie<T>::exportAsJson(std::string filename)
+{
+  std::ofstream file(filename);
+  file << this->toJson(this->root);
 }
 
 #endif

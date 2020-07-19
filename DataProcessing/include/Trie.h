@@ -3,6 +3,9 @@
 
 #include <map>
 #include <vector>
+#include <json.hpp>
+
+using json = nlohmann::json;
 
 template <typename T>
 struct TrieNode
@@ -25,6 +28,7 @@ class Trie
   int nwords;
 
   void getWords(TrieNode<T>* curnode, std::string prefix, std::vector<std::string>* pwords, std::ofstream* pfile=nullptr);
+  json toJson(TrieNode<T>* curnode);
   public:
     Trie();
     ~Trie();
@@ -34,6 +38,8 @@ class Trie
     T getKeyOf(std::string word);
     void getWords(std::vector<std::string>& words);
     void exportWords(std::string filename);
+    void toJson(json &jsonTrie);
+    void exportAsJson(std::string filename);
 };
 
 #include "Trie.tpp"

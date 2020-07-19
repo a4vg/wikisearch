@@ -2,7 +2,8 @@ CXX = g++
 CXXVERSION = --std=c++11
 
 IDIR = ./include
-CXXFLAGS = -I$(IDIR)
+LDIR = ./lib
+CXXFLAGS = -I$(IDIR) -I$(LDIR)
 LDFLAGS = -lzim -lmyhtml
 
 SRCDIR = ./src
