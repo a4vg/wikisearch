@@ -11,6 +11,33 @@
 #include <cstdlib> // getenv
 #include <iostream> // cerr
 
+std::map<std::string, std::string> Preprocessor::withoutTilde = {
+    {"ä", "a"},
+    {"á", "a"},
+    {"é", "e"},
+    {"ë", "e"},
+    {"í", "i"},
+    {"ï", "i"},
+    {"ó", "o"},
+    {"ö", "o"},
+    {"ú", "u"},
+    {"ü", "u"},
+    {"ñ", "n"},
+    {"Á", "A"},
+    {"Å", "A"},
+    {"Ă", "A"},
+    {"Ä", "A"},
+    {"É", "E"},
+    {"Ë", "E"},
+    {"Í", "I"},
+    {"Ï", "I"},
+    {"Ó", "O"},
+    {"Ö", "O"},
+    {"Ú", "U"},
+    {"Ü", "U"},
+    {"Ñ", "N"}
+  };
+
 Preprocessor::Preprocessor
 (std::string _text, std::string sw_filename, std::string lemmadic_filename): text(_text)
 {
@@ -131,16 +158,16 @@ void Preprocessor::removeTilde(std::string &word)
   if (word.empty()) return;
   for (int i=0; i<word.length(); ++i)
   {
-    if (this->hasTilde(word[i]))
+    if (Preprocessor::hasTilde(word[i]))
     { // Vowel with tilde is represented by two chars or a string.
       // string(it, it+2) builds a string with this two chars and
       // ++it skips the second char
 
       std::string newword = word.substr(0, i);
-      newword += this->withoutTilde[word.substr(i, 2)];
+      newword += Preprocessor::withoutTilde[word.substr(i, 2)];
       newword += word.substr(i+2, word.length()-i-2);
       word = newword;
-      break; // assumes there's just one tilde 
+      // break; // uncomment to assume there's just one tilde 
     }
   }
 }
@@ -181,7 +208,7 @@ void Preprocessor::preprocess()
     this->lowerStr(word);
     this->lemmatize(word);
     this->removeStopword(word);
-    this->removeTilde(word);
+    Preprocessor::removeTilde(word);
     this->removeNonAscii(word);
 
     if (!word.empty())

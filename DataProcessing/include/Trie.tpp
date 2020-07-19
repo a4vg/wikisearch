@@ -2,6 +2,8 @@
 #define TRIE_CPP
 
 #include <fstream>
+#include <string>
+#include <cctype> // tolower
 
 template <typename T>
 Trie<T>::~Trie()
@@ -85,6 +87,32 @@ void Trie<T>::exportWords(std::string filename)
   std::ofstream file(filename);
   std::ofstream* pfile = &file;
   this->getWords(this->root, "", nullptr, pfile);
+}
+
+template <typename T>
+json Trie<T>::toJson(TrieNode<T>* curnode, bool lower)
+{
+  json jsonSubtrie = { {"end", curnode->key!=T{}} };
+  for (const auto& pair : curnode->children)
+    if (pair.second && isalpha(pair.first)){
+      char c = pair.first;
+      if (lower) c = tolower(c);
+      jsonSubtrie[std::string(1, c)] = this->toJson(pair.second, lower);
+    }
+  return jsonSubtrie;
+}
+
+template <typename T>
+void Trie<T>::toJson(json &jsonTrie, bool lower)
+{
+  jsonTrie = this->toJson(this->root, lower);
+}
+
+template <typename T>
+void Trie<T>::exportAsJson(std::string filename, bool lower)
+{
+  std::ofstream file(filename);
+  file << this->toJson(this->root, lower);
 }
 
 #endif
