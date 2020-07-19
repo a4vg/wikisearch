@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import trieJson from "./trie.json";
+import trieJson from "./assets/trie-es-50K.json";
 
-const maxSuggestions = 10;
+const maxSuggestions = 50;
 
 const Icon = (
   <svg viewBox="0 0 20 20">
