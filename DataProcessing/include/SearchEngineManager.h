@@ -9,6 +9,7 @@
 #include <memory>
 #include "string.h"
 #include <vector>
+#include <sstream>
 
 #define MAX_ARTICLES 10
 #define ORDER 4
@@ -37,8 +38,9 @@ public:
     ~SearchEngineManager();
 
     void process ();
-    void search_word (const str);
-    void search_text (const str);
+    void print_search_word (const str);
+    void print_search_text (const str);
+    std::vector<size_t> search(const str);
     void search_text_parallel (const str, int);
 
 };
