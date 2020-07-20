@@ -209,7 +209,6 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
     }
 
     static void insert (const value_t& val, long idpage, Data &header, diskManager &dm){
-      std::cout << "Inserting " << val << std::endl;
       node_t root = readNode (header.root_id, dm);
       int state = insert(root, val, idpage, header, dm);
       if (state == OVERFLOW){
@@ -253,14 +252,14 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
       }
     }
 
-    static void search (const value_t &val, Data &header, diskManager &dm){
-      std::cout << "Searching in B+tree\n";
+    static int search (const value_t &val, Data &header, diskManager &dm){
       node_t root = readNode(header.root_id, dm);
       int res = search (root, val, dm);
+      return res;/*
       if (res == -1)
           std::cout << "Not found\n";
       else
-          std::cout << "Found: " << res << "\n";
+          std::cout << "Found: " << res << "\n";*/
     }
 
 };

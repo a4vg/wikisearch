@@ -46,8 +46,8 @@ class Tree <Node, true> {
     TreeHelper <node_t, NodeTraits<node_t>::flag_type>::print (data, dm);
   }
 
-  void search (const value_t& val){
-    TreeHelper <node_t, NodeTraits<node_t>::flag_type>::search (val, data, dm);
+  int search (const value_t& val){
+    return TreeHelper <node_t, NodeTraits<node_t>::flag_type>::search (val, data, dm);
   }
 
 
@@ -86,8 +86,8 @@ class Tree <Node, false> {
     TreeHelper <node_t, NodeTraits<node_t>::flag_type>::print (&root);
   }
 
-  void search (const value_t& val){
-    TreeHelper <node_t, NodeTraits<node_t>::flag_type>::search (&root, val);
+  int search (const value_t& val){
+    return TreeHelper <node_t, NodeTraits<node_t>::flag_type>::search (&root, val);
   }
 
   template <int Flag> 
