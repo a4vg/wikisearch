@@ -1,3 +1,6 @@
+#ifndef BPNODEHPP
+#define BPNODEHPP
+
 #include <iostream>
 #include <vector>
 #include "string.h"
@@ -18,55 +21,6 @@ class Cadena
      bool operator <=(const Cadena&);
      friend std::ostream& operator<<(std::ostream&, const Cadena&);
 };
-
-Cadena::Cadena(char *c)
-{    strcpy(cad,c);
-}
-
-Cadena::Cadena()
-{    strcpy(cad,"");
-}
-
-char *Cadena::get(void)
-{    return cad; 
-}
-
-Cadena &Cadena::operator=(const Cadena &c) {
-    if(this != &c) {
-        strncpy(cad, c.cad, sizeof(cad));
-    }
-    return *this;
-}
-
-bool Cadena::operator== (const Cadena &c){
-    if (strncmp (cad, c.cad, sizeof(cad)) == 0)
-        return true;
-    return false;
-}
-
-bool Cadena::operator!= (const Cadena &c){
-    if (strncmp (cad, c.cad, sizeof(cad)) != 0)
-        return true;
-    return false;
-}
-
-bool Cadena::operator< (const Cadena &c){
-    if (strncmp (cad, c.cad, sizeof(cad)) < 0)
-        return true;
-    return false;
-}
-
-bool Cadena::operator<= (const Cadena &c){
-    if (strncmp (cad, c.cad, sizeof(cad)) <= 0)
-        return true;
-    return false;
-}
-
-std::ostream& operator<<(std::ostream& os, const Cadena& c)
-{
-    os << c.cad;
-    return os;
-}
 
 template <typename T, int S>
 class BPNode {
@@ -100,3 +54,5 @@ class BPNode {
     ~BPNode(void){}
 
 };
+
+#endif
