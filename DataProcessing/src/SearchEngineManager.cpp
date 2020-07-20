@@ -92,9 +92,9 @@ void SearchEngineManager::search_word (const str word)
     }
 
     std::shared_ptr<DiskManager> pm1 = 
-        std::make_shared<DiskManager> ("btree.index", false);
+        std::make_shared<DiskManager> (treefile, false);
     std::shared_ptr<DiskManager> pm2 = 
-        std::make_shared<DiskManager> ("wordspage.index", false);
+        std::make_shared<DiskManager> (wordsfile, false);
 
     bptree mtree (pm1);
     Cadena cad ((char *) word.c_str());
@@ -124,13 +124,6 @@ void SearchEngineManager::search_text (const str text)
         std::cerr << "You need to provide a word to search" << std::endl;
         exit(1);
     }
-
-    std::shared_ptr<DiskManager> pm1 = 
-        std::make_shared<DiskManager> ("btree.index", false);
-    std::shared_ptr<DiskManager> pm2 = 
-        std::make_shared<DiskManager> ("wordspage.index", false);
-
-    bptree mtree (pm1);
 
     preprocessor.setText (text);
     auto wordstext = preprocessor.getWordCount ();
