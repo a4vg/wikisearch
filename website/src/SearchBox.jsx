@@ -72,7 +72,6 @@ class SearchBox extends Component {
 
   suggestions = () => {
     if (!this.state.currentTrie) return [];
-    // let prefix = this.state.inputDifference? this.state.input : "";
 
     /* js doesn't pass by reference, var creates a global variable instead */
     var words = [];
@@ -83,20 +82,22 @@ class SearchBox extends Component {
   };
 
   handleKeyPress = (e) => {
-    if(e.charCode==13){
+    if(e.charCode==13)
+    {
       let link = this.getLink();
       if (link)
+      {
         e.target.blur(); // take focus out of input
         this.props.history.push(this.getLink());
+      }
     }
   }
 
   getLink = () => {
     let input = this.state.previousInput + " " + this.state.input
     input = input.trim();
-    if (!input)
-      return null;
-    return `/?q=${encodeURI(input)}`;
+    if (input)
+      return `/?q=${encodeURI(input)}`;
   }
 
   render() {
@@ -111,7 +112,11 @@ class SearchBox extends Component {
           onFocus={() => this.setState({inputFocus: true})}
           onBlur={() => this.setState({inputFocus: false})}
         />
-        <Link to={this.getLink()}><button>{Icon}</button></Link>
+        { this.getLink()
+          ? <Link to={this.getLink()}><button>{Icon}</button></Link>
+          : <button>{Icon}</button>
+        }
+        
         {this.state.input && this.state.inputFocus && (
           <div className="searchbox-autocomplete">
             {
