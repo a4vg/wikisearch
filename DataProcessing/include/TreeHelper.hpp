@@ -34,7 +34,7 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
     typedef BPNode<T, S>  node_t;
     typedef typename node_t::value_t value_t;
 
-    enum state { OVERFLOW, NORMAL}; 
+    enum state { OVERFLOWNODE, NORMAL}; 
 
     static node_t readNode (long disk_id, diskManager &dm){
       node_t new_node(-1);
@@ -200,18 +200,18 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
             long page_id = node.children[pos];
             node_t child = readNode(page_id, dm);
             int state = insert(child, val, idpage, header, dm);
-            if (state == OVERFLOW){
+            if (state == OVERFLOWNODE){
                 splitNode(node, pos, header, dm);
             }
         }
         
-        return node.isOverflow() ? OVERFLOW : NORMAL;
+        return node.isOverflow() ? OVERFLOWNODE : NORMAL;
     }
 
     static void insert (const value_t& val, long idpage, Data &header, diskManager &dm){
       node_t root = readNode (header.root_id, dm);
       int state = insert(root, val, idpage, header, dm);
-      if (state == OVERFLOW){
+      if (state == OVERFLOWNODE){
         splitRoot (header, dm);
       }
     }

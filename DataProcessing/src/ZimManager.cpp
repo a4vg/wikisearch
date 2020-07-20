@@ -34,6 +34,14 @@ ZimManager::iterator ZimManager::iterator::operator++() {
     return *this;
 }
 
+ZimManager::iterator ZimManager::getIteratorFromArticleId(size_t idx)
+{
+    iterator iter(*this);
+    iter.i = zim::File::const_iterator(&this->file, idx);
+    iter.update_values();
+    return iter;
+}
+
 bool ZimManager::iterator::operator!=(const ZimManager::iterator& it2) {
     return i != it2.i;
 }

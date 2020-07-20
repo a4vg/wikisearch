@@ -84,7 +84,7 @@ void SearchEngineManager::process ()
     }
 }
 
-void SearchEngineManager::search_word (const str word)
+void SearchEngineManager::print_search_word (const str word)
 {
     if (word.empty ()){
         std::cerr << "You need to provide a word to search" << std::endl;
@@ -118,7 +118,7 @@ void SearchEngineManager::search_word (const str word)
     }
 }
 
-void SearchEngineManager::search_text (const str text)
+void SearchEngineManager::print_search_text (const str text)
 {
     if (text.empty ()){
         std::cerr << "You need to provide a word to search" << std::endl;
@@ -130,7 +130,37 @@ void SearchEngineManager::search_text (const str text)
     auto file = zim::File (zimfile);
 
     for (const auto& count: wordstext) 
-        search_word (count.first);
+        print_search_word (count.first);
+}
+
+
+std::vector<size_t> SearchEngineManager::search(const str text)
+{
+    std::vector<size_t> matches;
+
+    std::shared_ptr<DiskManager> pm_tree = 
+        std::make_shared<DiskManager> (treefile, false);
+    std::shared_ptr<DiskManager> pm_descriptor = 
+        std::make_shared<DiskManager> (wordsfile, false);
+
+    bptree tree (pm_tree);
+    preprocessor.setText(text);
+    auto wordstext = preprocessor.getWordCount();
+    for (const auto& count: wordstext)
+    {
+        Cadena cad((char *) count.first.c_str());
+        int id = tree.search(cad);
+        if (id == -1)
+            continue;
+        std::pair<int, int> results [MAX_ARTICLES];
+        pm_descriptor->retrieve_record (id, results);
+        for (int i = 0; i < MAX_ARTICLES; i++){
+            if (results[i].first > 0)
+                matches.push_back(results[i].first);
+        }
+    }
+    
+    return matches;
 }
 
 void SearchEngineManager::search_text_parallel (const str text, int numthreads)

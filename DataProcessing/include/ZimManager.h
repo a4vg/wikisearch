@@ -34,6 +34,7 @@ public:
     zim::File file;
     explicit ZimManager(const std::string&);
 
+    iterator getIteratorFromArticleId(size_t idx);
     iterator begin();
     iterator end();
 };
