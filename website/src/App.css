@@ -6,24 +6,67 @@
 body {
   margin: 0;
   background-color: #fcfcfc;
+  font-family: 'Roboto';
 }
+
+/*********************
+ * Global section *
+ *********************/
+.searchbar, .resultsContainer {
+  position: relative;
+  display: block;
+  height: 20%;
+  padding: 2rem;
+}
+
+/*********************
+ * Results section *
+ *********************/
+.resultsContainer {
+  padding-top: 1em;
+  padding-left: calc(2rem + 5rem + 1rem * 2); /* Searchbar padding + wiki img width + margin left-right */
+}
+
+.resultsContainer .result {
+  padding-top: 1em; 
+  width: calc(var(--searchbox-width));
+  min-width: 20rem;
+}
+
+/* Result title */
+.resultsContainer .result h3 {
+  margin: 0.5em 0;
+}
+
+.resultsContainer .result .keywords {
+  color: #5BA54A;
+}
+
+.resultsContainer .result .keywords span {
+  display: inline-block;
+  margin: 0 0.5em; 
+}
+
+/* Result description */
+.resultsContainer .result p {
+  margin: 0;
+  text-align: justify;
+  font-weight: 300;
+}
+
 
 /*********************
  * Searchbar section *
  *********************/
 .searchbar {
-  position: relative;
-  display: block;
-  height: 20%;
-  padding: 2em;
   background-color: #f5f5f5;
   white-space: nowrap;
 }
 
 .searchbar img {
-  height: 5rem;
+  width: 5rem;
   vertical-align: middle;
-  margin: 0px 1em;
+  margin: 0px 1rem;
 }
 
 /*
@@ -34,7 +77,6 @@ body {
   display: inline-block;
   height: var(--searchbox-height);
   width: var(--searchbox-width);
-  min-width: 15rem;
   border-radius: 25px;
   white-space: nowrap;
   box-shadow: 0 0 10px #ccc;
@@ -53,7 +95,7 @@ body {
 .searchbox input {
   font-family: 'Roboto';
   font-weight: 300;
-  padding: 1em;
+  padding: 1rem;
   font-size: 1rem;
   width: calc(100% - 5rem);
   min-width: 10rem;
@@ -105,7 +147,6 @@ body {
   max-height: 50vh;
   overflow-y: scroll;
   box-sizing: border-box;
-  font-family: 'Roboto';
   font-weight: 300;
   font-size: 1rem;
   line-height: 1.5rem;
@@ -113,6 +154,7 @@ body {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
   box-shadow: 0 5px 10px #eee;
+  z-index: 1;
 }
 
 .searchbox-autocomplete div {

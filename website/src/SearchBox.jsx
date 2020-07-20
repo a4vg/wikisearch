@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link, withRouter } from "react-router-dom";
 import trieJson from "./assets/trie-es-50K.json";
 
 const maxSuggestions = 50;
@@ -21,6 +22,7 @@ class SearchBox extends Component {
     input: "",
     currentTrie: trieJson,
     inputDifference: "",
+    inputFocus: false
   };
 
   resetTrieInput = () => {
@@ -80,22 +82,32 @@ class SearchBox extends Component {
     return words;
   };
 
+  handleKeyPress = (e) => {
+    if(e.charCode==13){
+      e.target.blur(); // take focus out of input
+      this.props.history.push(`/?q=${encodeURI(this.state.previousInput + " " + this.state.input)}`);
+    }
+  }
+
   render() {
     return (
       <div className="searchbox">
         <input
           onChange={(e) => this.setNewInput(e.target.value)}
+          onKeyPress={e => this.handleKeyPress(e)}
           value={this.state.previousInput + " " + this.state.input}
           type="text"
           placeholder="Busca artículos de Wikipedia..."
+          onFocus={() => this.setState({inputFocus: true})}
+          onBlur={() => this.setState({inputFocus: false})}
         />
-        <button onClick={() => console.log(trieJson)}>{Icon}</button>
-        {this.state.input && (
+        <Link to={`/?q=${encodeURI(this.state.previousInput + " " + this.state.input)}`}><button>{Icon}</button></Link>
+        {this.state.input && this.state.inputFocus && (
           <div className="searchbox-autocomplete">
             {
               this.suggestions().map((w, i) => (
               <div
-                onClick={() =>
+                onMouseDown={() =>
                   this.setNewInput(this.state.previousInput + " " + w)
                 }
                 key={i}
@@ -111,4 +123,5 @@ class SearchBox extends Component {
   }
 }
 
-export default SearchBox;
+/* export withRouter() to get the history from your props */
+export default withRouter(SearchBox);
