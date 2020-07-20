@@ -1,60 +1,53 @@
 import React, { Component } from "react";
 
+const server = "http://localhost:18080"
+
 class Results extends Component {
   state = {
-    articles: [
-      {
-        id: 1,
-        description:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu mauris molestie, gravida augue vitae, semper tellus. Proin gravida justo vitae finibus tempus. Pellentesque aliquam efficitur magna. Etiam fringilla, diam ac fringilla suscipit, ante orci consequat eros, at placerat turpis augue nec risus. Vestibulum tincidunt in ex nec molestie. Praesent et mattis nisi. Phasellus efficitur efficitur fermentum. Proin pharetra volutpat purus at vehicula. Proin non lacus sit amet ipsum imperdiet sollicitudin ultrices quis urna. Phasellus nec lectus dui. Nulla commodo at lorem at ultricies. Maecenas eget nunc eu lectus mattis consectetur. Aenean dapibus, justo vitae suscipit condimentum, enim dui pretium.",
-        title: "Título de artículo",
-        keywords: ["ipsum", "etiam", "aenean"],
-      },
-      {
-        id: 2,
-        description:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu mauris molestie, gravida augue vitae, semper tellus. Proin gravida justo vitae finibus tempus. Pellentesque aliquam efficitur magna. Etiam fringilla, diam ac fringilla suscipit, ante orci consequat eros, at placerat turpis augue nec risus. Vestibulum tincidunt in ex nec molestie. Praesent et mattis nisi. Phasellus efficitur efficitur fermentum. Proin pharetra volutpat purus at vehicula. Proin non lacus sit amet ipsum imperdiet sollicitudin ultrices quis urna. Phasellus nec lectus dui. Nulla commodo at lorem at ultricies. Maecenas eget nunc eu lectus mattis consectetur. Aenean dapibus, justo vitae suscipit condimentum, enim dui pretium.",
-        title: "Título de artículo",
-        keywords: ["ipsum", "etiam", "aenean"],
-      },
-      {
-        id: 3,
-        description:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu mauris molestie, gravida augue vitae, semper tellus. Proin gravida justo vitae finibus tempus. Pellentesque aliquam efficitur magna. Etiam fringilla, diam ac fringilla suscipit, ante orci consequat eros, at placerat turpis augue nec risus. Vestibulum tincidunt in ex nec molestie. Praesent et mattis nisi. Phasellus efficitur efficitur fermentum. Proin pharetra volutpat purus at vehicula. Proin non lacus sit amet ipsum imperdiet sollicitudin ultrices quis urna. Phasellus nec lectus dui. Nulla commodo at lorem at ultricies. Maecenas eget nunc eu lectus mattis consectetur. Aenean dapibus, justo vitae suscipit condimentum, enim dui pretium.",
-        title: "Título de artículo",
-        keywords: ["ipsum", "etiam", "aenean"],
-      },
-    ],
+    query: "",
+    articles: []
   };
 
-  getQuery = () => {
-    let params = new URLSearchParams(this.props.location.search);
-    return params.get("q");
-  };
+  componentDidUpdate(props, state){
+    let {search: q} = props.location;
+    if (q === state.query)
+      return null;
+
+    let newState = { query: q };
+
+    let url = `${server}/search${q}`;
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        newState.articles = data;
+        this.setState(newState);
+      });
+  }
 
   render() {
     let { articles } = this.state;
     return (
       <div className="resultsContainer">
       {
-        this.getQuery() &&
+        this.state.query && articles.length &&
         articles.map((article) => (
           <div key={article.id} className="result">
             <a href="#">
-              <h3>{this.getQuery()}</h3>
+              <h3>{article.title}</h3>
             </a>
             <div className="keywords">
               <b>Palabras clave:</b>
               {
-                article.keywords.map((kw, kidx) => (
-                  <span key={kidx}>{kw}</span>
+                article.keywords.map((kw, i) => (
+                  <span key={i}>{kw}</span>
                 ))
               }
             </div>
-            <p>{this.state.articles[0].description}</p>
+            <p>{article.description}</p>
           </div>
         ))
       }
+      {!articles.length && "No hay resultados"}
       </div>
     );
   }
