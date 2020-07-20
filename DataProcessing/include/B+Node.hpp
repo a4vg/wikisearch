@@ -1,7 +1,26 @@
+#ifndef BPNODEHPP
+#define BPNODEHPP
+
 #include <iostream>
 #include <vector>
+#include "string.h"
 
 #define B_PLUS_NODE_FLAGXX 3
+
+class Cadena
+{    char cad[40];
+   public:
+     Cadena(char *);
+     Cadena();
+     char * get(void);
+     void operator + (Cadena);
+     Cadena &operator= (const Cadena&);
+     bool operator ==(const Cadena&);
+     bool operator !=(const Cadena&);
+     bool operator <(const Cadena&);
+     bool operator <=(const Cadena&);
+     friend std::ostream& operator<<(std::ostream&, const Cadena&);
+};
 
 template <typename T, int S>
 class BPNode {
@@ -35,3 +54,5 @@ class BPNode {
     ~BPNode(void){}
 
 };
+
+#endif

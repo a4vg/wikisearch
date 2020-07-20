@@ -38,29 +38,29 @@ class Tree <Node, true> {
 
   ~Tree(void){}
 
-  void insert(const value_t& val){
-    add<NodeTraits<node_t>::flag_type>(val, data, dm);
+  void insert(const value_t& val, long idpage){
+    add<NodeTraits<node_t>::flag_type>(val, idpage, data, dm);
   }
 
   void print(){
     TreeHelper <node_t, NodeTraits<node_t>::flag_type>::print (data, dm);
   }
 
-  void search (const value_t& val){
-    TreeHelper <node_t, NodeTraits<node_t>::flag_type>::search (val, data, dm);
+  int search (const value_t& val){
+    return TreeHelper <node_t, NodeTraits<node_t>::flag_type>::search (val, data, dm);
   }
 
 
   template <int Flag> 
-  void add(const value_t&, Data&, diskManager&);
+  void add(const value_t&, long, Data&, diskManager&);
 
 };
 
 template<typename Node> template <int Flag>
 void Tree<Node, true>::add(
-  const typename Tree<Node, true>::value_t & val,
+  const typename Tree<Node, true>::value_t & val, long idpage,
   Data &data, diskManager &dm){
-  TreeHelper<Tree<Node, true>::node_t,Flag>::insert(val, data, dm);
+  TreeHelper<Tree<Node, true>::node_t,Flag>::insert(val, idpage, data, dm);
 }
 
 
@@ -86,8 +86,8 @@ class Tree <Node, false> {
     TreeHelper <node_t, NodeTraits<node_t>::flag_type>::print (&root);
   }
 
-  void search (const value_t& val){
-    TreeHelper <node_t, NodeTraits<node_t>::flag_type>::search (&root, val);
+  int search (const value_t& val){
+    return TreeHelper <node_t, NodeTraits<node_t>::flag_type>::search (&root, val);
   }
 
   template <int Flag> 
