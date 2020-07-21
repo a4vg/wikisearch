@@ -53,6 +53,7 @@ void SearchEngineManager::add_word (bptree &bt, diskManager &dm, const str word,
                 }
             } else {
                 articles [i] = temp;
+                break;
             }
         }
         dm->write_record (pid, articles);
@@ -61,9 +62,9 @@ void SearchEngineManager::add_word (bptree &bt, diskManager &dm, const str word,
 
 void SearchEngineManager::process ()
 {
-    std::shared_ptr<DiskManager> pm1 = 
+    diskManager pm1 = 
         std::make_shared<DiskManager> (treefile, true);
-    std::shared_ptr<DiskManager> pm2 = 
+    diskManager pm2 = 
         std::make_shared<DiskManager> (wordsfile, true);
 
     int total = 0;
@@ -91,9 +92,9 @@ void SearchEngineManager::print_search_word (const str word)
         exit(1);
     }
 
-    std::shared_ptr<DiskManager> pm1 = 
+    diskManager pm1 = 
         std::make_shared<DiskManager> (treefile, false);
-    std::shared_ptr<DiskManager> pm2 = 
+    diskManager pm2 = 
         std::make_shared<DiskManager> (wordsfile, false);
 
     bptree mtree (pm1);
@@ -134,13 +135,38 @@ void SearchEngineManager::print_search_text (const str text)
 }
 
 
+void SearchEngineManager::subsearch (const std::vector<str> vec, std::vector <size_t> &matches) {
+    diskManager pm_tree = 
+        std::make_shared<DiskManager> (treefile, false);
+    diskManager pm_descriptor = 
+        std::make_shared<DiskManager> (wordsfile, false);
+
+    bptree tree (pm_tree);
+
+    for (auto& c: vec) {
+        Cadena cad((char *) c.c_str());
+        int id = tree.search (cad);
+        if (id == -1)
+            return;
+        std::pair<int, int> results [MAX_ARTICLES];
+        pm_descriptor->retrieve_record (id, results);
+        for (int i = 0; i < MAX_ARTICLES; i++){
+            if (results[i].first > 0){
+                mtx.lock ();
+                matches.push_back(results[i].first);
+                mtx.unlock ();
+            }
+        }
+    }
+}
+
 std::vector<size_t> SearchEngineManager::search(const str text)
 {
     std::vector<size_t> matches;
 
-    std::shared_ptr<DiskManager> pm_tree = 
+    diskManager pm_tree = 
         std::make_shared<DiskManager> (treefile, false);
-    std::shared_ptr<DiskManager> pm_descriptor = 
+    diskManager pm_descriptor = 
         std::make_shared<DiskManager> (wordsfile, false);
 
     bptree tree (pm_tree);
@@ -163,8 +189,51 @@ std::vector<size_t> SearchEngineManager::search(const str text)
     return matches;
 }
 
-void SearchEngineManager::search_text_parallel (const str text, int numthreads)
+std::vector<size_t> SearchEngineManager::search_text_parallel (const str text)
 {
+    threads.clear();
+    unsigned int max_threads = std::thread::hardware_concurrency ();
+    //std::cout << "Max: " << max_threads << "\n";
+    std::vector<size_t> matches;
+
+    preprocessor.setText(text);
+    auto wordstext = preprocessor.getWordCount();
+    
+    int wordsperthread = wordstext.size() / max_threads;
+
+    std::vector <str> wordsforthread;
+    if (max_threads < wordstext.size ()) {
+        int total = 0;
+        int number_ofthread = 0;
+        for (const auto& count: wordstext) {
+            wordsforthread.push_back (count.first);
+            total ++;
+            if (total >= wordsperthread && number_ofthread < max_threads - 1) {
+                threads.push_back( new std::thread (&SearchEngineManager::subsearch, this, wordsforthread, std::ref(matches)));
+                wordsforthread.clear ();
+                number_ofthread++;
+                total = 0;
+            }
+        }
+        threads.push_back (new std::thread (&SearchEngineManager::subsearch, this, wordsforthread, std::ref(matches)));
+    } else {
+        for (const auto& count: wordstext) {
+            wordsforthread.clear ();
+            wordsforthread.push_back (count.first);
+            threads.push_back(new std::thread (&SearchEngineManager::subsearch, this, wordsforthread, std::ref(matches)));
+        }
+    }
+
+    for (int i = 0; i < threads.size(); i++) {
+        threads[i]->join();
+        delete threads [i];
+    }
+
+    return matches;
+
+    /*for (auto& m: matches)
+        std::cout << m << " ";*/
+    //std::cout << "\n" << matches.size() << "\n";
 }
 
 #endif

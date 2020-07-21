@@ -10,6 +10,8 @@
 #include "string.h"
 #include <vector>
 #include <sstream>
+#include <thread>
+#include <mutex>
 
 #define MAX_ARTICLES 10
 #define ORDER 4
@@ -30,6 +32,8 @@ private:
     Preprocessor preprocessor;
     str treefile;
     str wordsfile;
+    std::vector <std::thread *> threads;
+    std::mutex mtx;
 
     void add_word (bptree &, diskManager &, const str, const int, const int);
 
@@ -41,7 +45,8 @@ public:
     void print_search_word (const str);
     void print_search_text (const str);
     std::vector<size_t> search(const str);
-    void search_text_parallel (const str, int);
+    std::vector<size_t> search_text_parallel (const str);
+    void subsearch (const std::vector<str> , std::vector <size_t>&);
 
 };
 
