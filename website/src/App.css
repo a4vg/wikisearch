@@ -1,6 +1,7 @@
 :root {
   --searchbox-height: 3rem;
   --searchbox-width: 60%;
+  --results-description-max-lines: 5;
 }
 
 body {
@@ -50,8 +51,15 @@ body {
 /* Result description */
 .resultsContainer .result p {
   margin: 0;
+  display: -webkit-box;
   text-align: justify;
   font-weight: 300;
+
+  /* Show only a max num of lines */
+  -webkit-line-clamp: var(--results-description-max-lines);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis; 
 }
 
 
