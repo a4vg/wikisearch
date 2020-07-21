@@ -63,14 +63,17 @@ void SearchEngineManager::add_word (bptree &bt, diskManager &dm, const str word,
     }
 }
 
-void SearchEngineManager::process (bool print, int print_count)
+void SearchEngineManager::process (ZimManager::iterator itbegin, bool print, int print_count)
 {
+    bool trunc = ((*itbegin).first == (*manager->begin()).first)? true : false;
+    std::cout << "Trunc :" << trunc << "\n"; 
+
     diskManager pm1 = 
-        std::make_shared<DiskManager> (treefile, true);
+        std::make_shared<DiskManager> (treefile, trunc);
     diskManager pm2 = 
-        std::make_shared<DiskManager> (wordsfile, true);
+        std::make_shared<DiskManager> (wordsfile, trunc);
     std::shared_ptr<DiskManager> kwpm = 
-        std::make_shared<DiskManager> (keywordfile, true);
+        std::make_shared<DiskManager> (keywordfile, trunc);
 
     int total = 0;
     pm2->write_record (0, total);
@@ -80,7 +83,8 @@ void SearchEngineManager::process (bool print, int print_count)
     size_t totalArticles = manager->getTotalArticles();
 
     int c = 0;
-    for(auto iter = manager->begin(); iter!=manager->end(); ++iter)
+
+    for(auto iter = itbegin; iter!=manager->end(); ++iter)
     {
         if (c%print_count==0 && print)
             std::cout << c << " valid articles processed. "
