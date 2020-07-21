@@ -139,4 +139,4 @@ class SearchBox extends Component {
 }
 
 /* export withRouter() to get the history from your props */
-export default withRouter(SearchBox);
+export default SearchBox;

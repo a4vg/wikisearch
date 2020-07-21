@@ -9,11 +9,14 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Router exact path="/">
+        <Router>
+        <Route exact path="/" render={ (p) =>
           <div className="searchbar">
             <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/1920px-Wikipedia-logo-v2.svg.png" />
-            <SearchBox />
+            <SearchBox {...p} />
           </div>
+        }/>
+          
           <Route exact path="/" component={Results} />
         </Router>
       </div>
