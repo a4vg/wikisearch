@@ -1,18 +1,21 @@
 #ifndef SEARCHENGINE
 #define SEARCHENGINE
 
-#include "SearchEngineManager.h"
+#include "include/SearchEngineManager.h"
 
+bool compare(std::pair<size_t, double> a, std::pair<size_t, double> b){
+    return a.second > b.second;
+}
 
 SearchEngineManager::SearchEngineManager(const str zfile, const str tfile,
     const str wfile): zimfile (zfile), treefile (tfile), wordsfile (wfile)
 {
     if (zimfile.empty())
-        zimfile = "data/zim/wiki-mini.zim";
+        zimfile = "../DataProcessing/data/zim/wiki-mini.zim";
     if (treefile.empty())
-        treefile = "btree.index";
+        treefile = "../DataProcessing/btree.index";
     if (wordsfile.empty())
-        wordsfile = "wordpage.index";
+        wordsfile = "../DataProcessing/wordpage.index";
 
     manager = new ZimManager (zimfile);
 }
@@ -61,9 +64,9 @@ void SearchEngineManager::add_word (bptree &bt, diskManager &dm, const str word,
 
 void SearchEngineManager::process ()
 {
-    std::shared_ptr<DiskManager> pm1 = 
+    std::shared_ptr<DiskManager> pm1 =
         std::make_shared<DiskManager> (treefile, true);
-    std::shared_ptr<DiskManager> pm2 = 
+    std::shared_ptr<DiskManager> pm2 =
         std::make_shared<DiskManager> (wordsfile, true);
 
     int total = 0;
@@ -88,9 +91,9 @@ void SearchEngineManager::print_search_word (const str word)
         exit(1);
     }
 
-    std::shared_ptr<DiskManager> pm1 = 
+    std::shared_ptr<DiskManager> pm1 =
         std::make_shared<DiskManager> (treefile, false);
-    std::shared_ptr<DiskManager> pm2 = 
+    std::shared_ptr<DiskManager> pm2 =
         std::make_shared<DiskManager> (wordsfile, false);
 
     bptree mtree (pm1);
@@ -105,9 +108,9 @@ void SearchEngineManager::print_search_word (const str word)
         pm2->retrieve_record (id, results);
         for (int i = 0; i < MAX_ARTICLES; i++){
             if (results[i].first > 0)
-            std::cout << "Article " << results[i].first << 
-            ": - Count:" << results[i].second << ", Title: " 
-            <<  file.getArticle(results[i].first).getTitle() << ", Namespace: "
+            std::cout << "Article " << results[i].first <<
+            ": - Count:" << results[i].second << ", Title: "
+            << file.getArticle(results[i].first).getTitle() << ", Namespace: "
             << file.getArticle(results[i].first).getNamespace() << "\n";
         }
     } else {
@@ -126,14 +129,41 @@ void SearchEngineManager::print_search_text (const str text)
     auto wordstext = preprocessor.getWordCount ();
     auto file = zim::File (zimfile);
 
-    for (const auto& count: wordstext) 
+    for (const auto& count: wordstext)
         print_search_word (count.first);
 }
 
+std::vector<size_t> SearchEngineManager::ranked_search(const str text){
+    std::set<size_t> results = search(text);
+    preprocessor.setText(text);
+    std::map<size_t, double> m_rank;
+    double tf_idf;
 
-std::vector<size_t> SearchEngineManager::search(const str text)
+    for(auto&term:preprocessor.getWordCount()){
+        for(auto&document:results){
+            tf_idf = tfidf(document, term.first, results);
+            m_rank[document] += tf_idf;
+            std::cout << term.first << 'x' << document << ':' << m_rank[document] << '\n';
+        }
+    }
+
+    std::vector<std::pair<size_t, double>> rank;
+    for(auto&p:m_rank)
+        rank.push_back(p);
+
+    std::sort(rank.begin(), rank.end(), compare);
+    std::vector<size_t> top_results(MAX_ARTICLES);
+
+    for(int i=0;i<MAX_ARTICLES;++i)
+        top_results[i] = rank[i].first;
+
+    return top_results;
+}
+
+
+std::set<size_t> SearchEngineManager::search(const str text)
 {
-    std::vector<size_t> matches;
+    std::set<size_t> matches;
 
     std::shared_ptr<DiskManager> pm_tree = 
         std::make_shared<DiskManager> (treefile, false);
@@ -151,9 +181,9 @@ std::vector<size_t> SearchEngineManager::search(const str text)
             continue;
         std::pair<int, int> results [MAX_ARTICLES];
         pm_descriptor->retrieve_record (id, results);
-        for (int i = 0; i < MAX_ARTICLES; i++){
-            if (results[i].first > 0)
-                matches.push_back(results[i].first);
+        for (auto & result : results){
+            if (result.first > 0)
+                matches.insert(result.first);
         }
     }
     
@@ -162,6 +192,32 @@ std::vector<size_t> SearchEngineManager::search(const str text)
 
 void SearchEngineManager::search_text_parallel (const str text, int numthreads)
 {
+}
+
+double SearchEngineManager::tfidf(size_t document, str term, std::set<size_t> results) {
+
+    int df = 0;
+    std::map<std::string, int> wordCount;
+    std::map<std::string, int>::iterator it;
+    for(auto&doc:results){
+        preprocessor.setText((*manager->getIteratorFromArticleId(doc)).second);
+        wordCount = preprocessor.getWordCount();
+        it = wordCount.find(term);
+        if(it != wordCount.end())
+            df++;
+    }
+
+    preprocessor.setText((*manager->getIteratorFromArticleId(document)).second);
+    wordCount = preprocessor.getWordCount();
+
+    it = wordCount.find(term);
+    double tf = 1;
+    if(it != wordCount.end())
+        tf += it->second / (double) wordCount.size();
+
+    double idf = log((double)results.size()/(df+1));
+
+    return tf / idf;
 }
 
 #endif

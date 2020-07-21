@@ -9,6 +9,7 @@
 #include <memory>
 #include "string.h"
 #include <vector>
+#include <set>
 #include <sstream>
 
 #define MAX_ARTICLES 10
@@ -38,9 +39,10 @@ public:
     void process ();
     void print_search_word (const str);
     void print_search_text (const str);
-    std::vector<size_t> search(const str);
+    std::set<size_t> search(const str);
+    std::vector<size_t> ranked_search(const str);
     void search_text_parallel (const str, int);
-
+    double tfidf(size_t, str, std::set<size_t>);
 };
 
 #endif

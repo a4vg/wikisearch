@@ -1,7 +1,7 @@
 #ifndef BPNODECPP
 #define BPNODECPP
 
-#include "B+Node.hpp"
+#include "include/B+Node.hpp"
 
 Cadena::Cadena(char *c)
 {    strcpy(cad,c);

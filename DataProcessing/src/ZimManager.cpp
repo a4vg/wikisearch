@@ -1,7 +1,7 @@
 #ifndef ZIMMANAGER_CPP
 #define ZIMMANAGER_CPP
 
-#include "ZimManager.h"
+#include "include/ZimManager.h"
 
 ZimManager::ZimManager(const std::string& filename) {
     auto f = new zim::File(filename);

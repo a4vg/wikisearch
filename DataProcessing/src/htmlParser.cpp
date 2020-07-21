@@ -4,7 +4,7 @@
 #include <myhtml/api.h>
 #include <vector>
 
-#include "htmlParser.h"
+#include "include/htmlParser.h"
 
 void cleanWikipediaHtmlTree(myhtml_tree_t* tree, myhtml_tree_node_t *body)
 {
