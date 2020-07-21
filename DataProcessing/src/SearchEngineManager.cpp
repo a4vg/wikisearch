@@ -63,7 +63,7 @@ void SearchEngineManager::add_word (bptree &bt, diskManager &dm, const str word,
     }
 }
 
-void SearchEngineManager::process ()
+void SearchEngineManager::process (bool print, int print_count)
 {
     std::shared_ptr<DiskManager> pm1 = 
         std::make_shared<DiskManager> (treefile, true);
@@ -77,9 +77,17 @@ void SearchEngineManager::process ()
     kwpm->write_record (0, total);
 
     bptree mytree (pm1);
+    size_t totalArticles = manager->getTotalArticles();
 
+    int c = 0;
     for(auto iter = manager->begin(); iter!=manager->end(); ++iter)
     {
+        if (c%print_count==0 && print)
+            std::cout << c << " valid articles processed. "
+            << "Current ID: "<< (*iter).first
+            << " from a total of : "<< totalArticles << "\n";
+        ++c;
+
         preprocessor.setText((*iter).second);
         auto wordCount = preprocessor.getWordCount();
 

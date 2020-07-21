@@ -41,7 +41,7 @@ public:
     SearchEngineManager(const str ="", const str ="", const str ="", const str ="");
     ~SearchEngineManager();
 
-    void process ();
+    void process (bool print=false, int print_count=100);
     void print_search_word (const str);
     void print_search_text (const str);
     std::vector<size_t> search(const str);
