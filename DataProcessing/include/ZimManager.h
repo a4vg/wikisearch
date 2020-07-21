@@ -34,6 +34,9 @@ public:
     zim::File file;
     explicit ZimManager(const std::string&);
 
+    std::string getArticleHtml(size_t idx);
+    bool isValidArticle(size_t idx);
+    std::string getArticleTitle(size_t idx);
     iterator getIteratorFromArticleId(size_t idx);
     iterator begin();
     iterator end();

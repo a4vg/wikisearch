@@ -42,6 +42,28 @@ ZimManager::iterator ZimManager::getIteratorFromArticleId(size_t idx)
     return iter;
 }
 
+std::string ZimManager::getArticleHtml(size_t idx)
+{
+    zim::Blob blob = file.getArticle(idx).getRedirectArticle().getData();
+    return std::string(blob.data(), blob.size());
+}
+
+bool ZimManager::isValidArticle(size_t idx)
+{
+    return file.getArticle(idx).getNamespace() == 'A' &&
+           file.getArticle(idx).getLibraryMimeType() == ACCEPTED_MYMETYPE;
+}
+
+std::string ZimManager::getArticleTitle(size_t idx)
+{
+    auto a = file.getArticle(idx);
+
+    std::cout << "Is redirect?: " << a.isRedirect() << "\n";
+    std::cout << "Redirected article: " << a.getRedirectArticle().getIndex() 
+              << "\nRedirected mimetype: " << a.getLibraryMimeType() << "\n";
+    return std::string(a.getTitle()) + " **** " + std::string(a.getRedirectArticle().getTitle());
+}
+
 bool ZimManager::iterator::operator!=(const ZimManager::iterator& it2) {
     return i != it2.i;
 }
