@@ -72,7 +72,6 @@ int main()
                 return responseWithCors(error("ID doesn't belong to an article", article));
             article["title"] = zimmanager.getArticleTitle(idx);
             article["html"] = zimmanager.getArticleHtml(idx);
-            // std::cout << zimmanager.getArticleHtml(idx);
         } catch (const std::exception& e) {
             return responseWithCors(error("Invalid article ID: Index out of range", article));
         }
