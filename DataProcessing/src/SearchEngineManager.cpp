@@ -239,6 +239,20 @@ std::vector<size_t> SearchEngineManager::search(const str text)
     return matches;
 }
 
+std::vector<std::string> SearchEngineManager::getArticleKeywords(size_t idx)
+{
+    std::vector<str> kws;
+    std::shared_ptr<DiskManager> kwpm = 
+    std::make_shared<DiskManager> (keywordfile, false);
+
+    str keywords[MAX_KEYWORDS];
+    kwpm->retrieve_record (idx, keywords);
+    for (int i=0; i<MAX_KEYWORDS; ++i)
+        if (keywords[i]!="")
+            kws.push_back(keywords[i]);
+    return kws;
+}
+
 std::vector<size_t> SearchEngineManager::search_text_parallel (const str text)
 {
     threads.clear();

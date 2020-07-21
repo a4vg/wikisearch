@@ -46,6 +46,7 @@ public:
     SearchEngineManager(const str ="", const str ="", const str ="", const str ="");
     ~SearchEngineManager();
 
+    std::vector<str> getArticleKeywords(size_t idx);
     void process (bool print=false, int print_count=100);
     void print_search_word (const str);
     void print_search_text (const str);
