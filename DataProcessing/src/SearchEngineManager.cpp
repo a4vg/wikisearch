@@ -30,10 +30,11 @@ void SearchEngineManager::add_word (bptree &bt, diskManager &dm, const str word,
     int total = 0;
     dm->retrieve_record (0, total);
     Cadena cadena ((char *) word.c_str());
-    int pid = bt.search (cadena);
+    //int pid = bt.search (cadena);
+    int pid = bt.insert (cadena, total + 1);
     if (pid == -1) {
         int newpageId = total + 1;
-        bt.insert (cadena, newpageId);
+        //bt.insert (cadena, newpageId);
         std::pair<int, int> articles [MAX_ARTICLES];
         for (int i = 0; i < MAX_ARTICLES; i++) {
             articles [i] = std::make_pair (0, 0);
@@ -93,7 +94,8 @@ void SearchEngineManager::process (bool print, int print_count)
 
         // // Get the MAX_KEYWORDS most frequent words in article
         std::vector<std::pair<str, int> > wordsFreq;
-        str keywords[MAX_KEYWORDS]; // empty strings
+        //str keywords[MAX_KEYWORDS]; // empty strings
+        Cadena keywords [MAX_KEYWORDS];
         for (auto& count: wordCount) {
             wordsFreq.push_back(count);
         }
@@ -109,7 +111,8 @@ void SearchEngineManager::process (bool print, int print_count)
         // Get the keywords and store them
         for (int i=0; i<max_kw; ++i)
         {
-            keywords[i] = wordsFreq[i].first; // don't store count, only words
+            //keywords[i] = wordsFreq[i].first; // don't store count, only words
+            keywords [i] = Cadena ((char *) wordsFreq [i].first.c_str());
         }
 
         kwpm->write_record (0, ++total);
@@ -148,10 +151,11 @@ void SearchEngineManager::print_search_word (const str word)
         for (int i = 0; i < MAX_ARTICLES; i++){
             
             const size_t artId = results[i].first;
-            
+
             if (artId > 0)
             {
-                str keywords[MAX_KEYWORDS];
+                //str keywords[MAX_KEYWORDS];
+                Cadena keywords [MAX_KEYWORDS];
                 kwpm->retrieve_record (artId, keywords);
 
                 std::cout << "Article " << artId << 
