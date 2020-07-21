@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
 const server = "http://localhost:18080"
 
@@ -8,9 +9,9 @@ class Results extends Component {
     articles: []
   };
 
-  componentDidUpdate(props, state){
-    let {search: q} = props.location;
-    if (q === state.query)
+  updateState = () => {
+    let {search: q} = this.props.location;
+    if (q === this.state.query)
       return null;
 
     let newState = { query: q };
@@ -24,6 +25,14 @@ class Results extends Component {
       });
   }
 
+  componentDidMount(){
+    this.updateState();
+  }
+
+  componentDidUpdate(props, state){
+    this.updateState();
+  }
+
   render() {
     let { articles } = this.state;
     return (
@@ -32,7 +41,7 @@ class Results extends Component {
         this.state.query && articles.length &&
         articles.map((article) => (
           <div key={article.id} className="result">
-            <a href="#">
+            <a href={`${server}/article/${article.id}`}>
               <h3>{article.title}</h3>
             </a>
             <div className="keywords">

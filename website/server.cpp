@@ -69,16 +69,16 @@ int main()
             return responseWithCors(error("Invalid article ID", article));
 
         try {
-            if (zimmanager.isValidArticle(idx))
+            if (!zimmanager.isValidArticle(idx))
                 return responseWithCors(error("ID doesn't belong to an article", article));
             article["title"] = zimmanager.getArticleTitle(idx);
             article["html"] = zimmanager.getArticleHtml(idx);
-            std::cout << zimmanager.getArticleHtml(idx);
+            // std::cout << zimmanager.getArticleHtml(idx);
         } catch (const std::exception& e) {
             return responseWithCors(error("Invalid article ID: Index out of range", article));
         }
 
-        return responseWithCors(article.dump());
+        return responseWithCors(zimmanager.getArticleHtml(idx));
     });
 
     app.port(18080).run();
