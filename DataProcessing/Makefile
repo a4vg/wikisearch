@@ -4,7 +4,7 @@ CXXVERSION = --std=c++11
 IDIR = ./include
 LDIR = ./lib
 CXXFLAGS = -I$(IDIR) -I$(LDIR)
-LDFLAGS = -lzim -lmyhtml
+LDFLAGS = -lzim -lmyhtml -pthread
 
 SRCDIR = ./src
 SRCFILES = $(wildcard $(SRCDIR)/*.cpp)

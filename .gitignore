@@ -4,6 +4,8 @@
 !*/
 !Makefile
 
+a.out
+
 .DS_Store
 
 .idea/
@@ -14,3 +16,5 @@ node_modules/
 dist/
 
 build/
+
+*.index

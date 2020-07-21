@@ -1,22 +1,24 @@
 #include <iostream>
 #include "SearchEngineManager.h"
-#include "ZimManager.h"
 
 int main(int argc, char* argv[])
 {
-    ZimManager zimmanager("./data/zim/wiki-mini.zim");
-    SearchEngineManager sem("./data/zim/wiki-mini.zim", "../website/btree.index", "../website/wordpage.index");
-    sem.process();
-    // sem.print_search_text ("unir wisconsin seguir de Global juego");
-    // sem.print_search_text("unir wisconsin seguir de Global juego");
-    // for (size_t id: matchesId)
-    // {
+    SearchEngineManager sem;
+    sem.process ();
+    sem.print_search_text ("unir wisconsin seguir de Global juego");
+    sem.print_search_text ("unir wisconsin seguir encontrar");
+    sem.print_search_text ("unir wisconsin seguir edad encontrar andar america ultimo");
+    std::cout << "\nParalel 1:\n";
+    for (auto &res: sem.search_text_parallel ("unir wisconsin seguir"))
+        std::cout << "Article " << res << ", ";
+    std::cout << "\n\nParalel 2:\n";
+    for (auto &res: sem.search_text_parallel ("unir wisconsin seguir encontrar"))
+        std::cout << "Article " << res << ", ";
+    std::cout << "\n\nParalel 3:\n";
+    for (auto &res: sem.search_text_parallel ("unir wisconsin seguir edad encontrar andar america ultimo"))
+        std::cout << "Article " << res << ", ";
 
-    //     auto it = zimmanager.getIteratorFromArticleId(id);
-    //     std::cout << "ID: " << (*it).first << "\n";
-    //     // std::cout << "id: " << id << "\n";
-    //     // std::cout << (*it).second << "\n\n";
-    // }
+    std::cout << "\n\n=====================================================\n";
 
     return 0;
 }
