@@ -3,6 +3,9 @@
 
 #include "SearchEngineManager.h"
 
+bool compare(std::pair<size_t, double> a, std::pair<size_t, double> b){
+    return a.second > b.second;
+}
 
 SearchEngineManager::SearchEngineManager(const str zfile, const str tfile,
     const str wfile, const str kwfile)
@@ -218,9 +221,9 @@ void SearchEngineManager::subsearch (const std::vector<str> vec, std::vector <si
     }
 }
 
-std::vector<size_t> SearchEngineManager::search(const str text)
+std::set<size_t> SearchEngineManager::search(const str text)
 {
-    std::vector<size_t> matches;
+    std::set<size_t> matches;
 
     diskManager pm_tree = 
         std::make_shared<DiskManager> (treefile, false);
@@ -240,11 +243,40 @@ std::vector<size_t> SearchEngineManager::search(const str text)
         pm_descriptor->retrieve_record (id, results);
         for (int i = 0; i < MAX_ARTICLES; i++){
             if (results[i].first > 0)
-                matches.push_back(results[i].first);
+                matches.insert(results[i].first);
         }
     }
     
     return matches;
+}
+
+std::vector<size_t> SearchEngineManager::ranked_search(const str text){
+    std::set<size_t> results = search(text);
+    preprocessor.setText(text);
+    std::map<size_t, double> m_rank;
+    double tf_idf;
+
+    for(auto&term:preprocessor.getWordCount()){
+        for(auto&document:results){
+            tf_idf = tfidf(document, term.first, results);
+            m_rank[document] += tf_idf;
+            //std::cout << term.first << 'x' << document << ':' << m_rank[document] << '\n';
+        }
+    }
+
+    std::vector<std::pair<size_t, double>> rank;
+    for(auto&p:m_rank)
+        rank.push_back(p);
+
+    std::sort(rank.begin(), rank.end(), compare);
+
+    int max_size = (MAX_ARTICLES < rank.size()) ? MAX_ARTICLES: rank.size();
+    std::vector<size_t> top_results(max_size);
+
+    for(int i=0;i<max_size;++i)
+        top_results[i] = rank[i].first;
+
+    return top_results;
 }
 
 std::vector<std::string> SearchEngineManager::getArticleKeywords(size_t idx)
@@ -253,11 +285,14 @@ std::vector<std::string> SearchEngineManager::getArticleKeywords(size_t idx)
     std::shared_ptr<DiskManager> kwpm = 
     std::make_shared<DiskManager> (keywordfile, false);
 
-    str keywords[MAX_KEYWORDS];
+    Cadena keywords[MAX_KEYWORDS];
     kwpm->retrieve_record (idx, keywords);
-    for (int i=0; i<MAX_KEYWORDS; ++i)
-        if (keywords[i]!="")
-            kws.push_back(keywords[i]);
+    for (int i=0; i<MAX_KEYWORDS; ++i) {
+        str temp (keywords [i].get ());
+        
+        if (temp.size())
+            kws.push_back(temp);
+    }
     return kws;
 }
 
@@ -306,6 +341,32 @@ std::vector<size_t> SearchEngineManager::search_text_parallel (const str text)
     /*for (auto& m: matches)
         std::cout << m << " ";*/
     //std::cout << "\n" << matches.size() << "\n";
+}
+
+double SearchEngineManager::tfidf(size_t document, str term, std::set<size_t> results) {
+
+    int df = 0;
+    std::map<std::string, int> wordCount;
+    std::map<std::string, int>::iterator it;
+    for(auto&doc:results){
+        preprocessor.setText((*manager->getIteratorFromArticleId(doc)).second);
+        wordCount = preprocessor.getWordCount();
+        it = wordCount.find(term);
+        if(it != wordCount.end())
+            df++;
+    }
+
+    preprocessor.setText((*manager->getIteratorFromArticleId(document)).second);
+    wordCount = preprocessor.getWordCount();
+
+    it = wordCount.find(term);
+    double tf = 1;
+    if(it != wordCount.end())
+        tf += it->second / (double) wordCount.size();
+
+    double idf = log((double)results.size()/(df+1));
+
+    return tf / idf;
 }
 
 #endif

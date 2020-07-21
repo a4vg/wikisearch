@@ -12,6 +12,6 @@ OBJFILES = $(SRCFILES:.c=.o)
 
 DATADIR = data/
 
-processing : $(OBJFILES)
+genIndexServer : $(OBJFILES)
 	$(CXX) $(CXXVERSION) $(CXXFLAGS) $^ $@.cpp -o $@ $(LDFLAGS) ;\
 	export DATA_DIR=$(DATADIR) ;

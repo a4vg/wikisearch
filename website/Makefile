@@ -5,7 +5,7 @@ LDIR = ./lib
 DP_LDIR = ../DataProcessing/lib
 DP_IDIR = ../DataProcessing/include
 CXXFLAGS = -I$(LDIR) -I$(DP_IDIR) -I$(DP_LDIR)
-LDFLAGS = -lzim -lmyhtml
+LDFLAGS = -lzim -lmyhtml -pthread
 
 DP_SRCDIR = ../DataProcessing/src
 SRCFILES = $(wildcard $(DP_SRCDIR)/*.cpp)

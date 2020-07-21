@@ -14,6 +14,7 @@
 #include <utility> // pair
 #include <thread>
 #include <mutex>
+#include <set>
 
 #define MAX_KEYWORDS 3
 #define MAX_ARTICLES 10
@@ -50,10 +51,11 @@ public:
     void process (ZimManager::iterator itbegin, bool print=false, int print_count=100);
     void print_search_word (const str);
     void print_search_text (const str);
-    std::vector<size_t> search(const str);
+    std::set<size_t> search(const str);
+    std::vector<size_t> ranked_search(const str);
     std::vector<size_t> search_text_parallel (const str);
     void subsearch (const std::vector<str> , std::vector <size_t>&);
-
+    double tfidf(size_t, str, std::set<size_t>);
 };
 
 #endif
