@@ -35,6 +35,7 @@ public:
     zim::File file;
     explicit ZimManager(const std::string&);
 
+    size_t getTotalArticles();
     std::string getArticleHtml(size_t idx);
     bool isValidArticle(size_t idx);
     static bool isValidArticle(const zim::Article &a);

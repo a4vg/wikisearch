@@ -13,6 +13,11 @@ ZimManager::ZimManager(const std::string& filename) {
     file = *f;
 }
 
+size_t ZimManager::getTotalArticles()
+{
+    return this->file.getCountArticles();
+};
+
 ZimManager::iterator ZimManager::begin() {
     iterator iter(*this);
     iter.i = file.begin();
