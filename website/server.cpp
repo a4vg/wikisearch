@@ -17,7 +17,6 @@ void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
         nlohmann::json article;
         article["id"] = id;
         article["title"] = zimmanager.getArticleTitle(id);
-        article["html"] = zimmanager.getArticleHtml(id);
 
         auto it = zimmanager.getIteratorFromArticleId(id);
         article["description"] = (*it).second;

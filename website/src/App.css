@@ -35,6 +35,10 @@ body {
 }
 
 /* Result title */
+.resultsContainer h3 {
+  margin: 0;
+}
+
 .resultsContainer .result h3 {
   margin: 0.5em 0;
 }

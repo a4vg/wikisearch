@@ -37,6 +37,7 @@ class Results extends Component {
     let { articles } = this.state;
     return (
       <div className="resultsContainer">
+      <h3>Se han encontrado { articles.length } resultados</h3>
       {
         this.state.query && articles.length &&
         articles.map((article) => (
