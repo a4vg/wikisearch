@@ -16,7 +16,8 @@ void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
     {
         nlohmann::json article;
         article["id"] = id;
-        article["title"] = std::string(zimmanager.file.getArticle(id).getTitle());
+        article["title"] = zimmanager.getArticleTitle(id);
+        article["html"] = zimmanager.getArticleHtml(id);
 
         auto it = zimmanager.getIteratorFromArticleId(id);
         article["description"] = (*it).second;
@@ -28,6 +29,21 @@ void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
     }
 }
 
+crow::response responseWithCors(std::string x)
+{
+    auto r = crow::response(x);
+    r.add_header("Access-Control-Allow-Origin", "*");
+    return r;
+}
+
+std::string error(const char* e, nlohmann::json info = {})
+{
+    nlohmann::json jsonErr = nlohmann::json({{"error", e}});
+    if (!info.empty())
+        jsonErr["info"] = info;
+    return jsonErr.dump();
+}
+
 
 int main()
 {
@@ -37,17 +53,32 @@ int main()
     ([](const crow::request& req) {
         auto q = req.url_params.get("q");
         if (!q)
-        {
-            auto r = crow::response(nlohmann::json({{"error", "Missing parameter q"}}).dump());
-            r.add_header("Access-Control-Allow-Origin", "*");
-            return r;
-        }
+            return responseWithCors(error("Missing parameter q"));
 
         nlohmann::json articlesJson = nlohmann::json::array();
         getJsonFromSearch(articlesJson, std::string(q));
-        auto r = crow::response(articlesJson.dump());
-        r.add_header("Access-Control-Allow-Origin", "*");
-        return r;
+        return responseWithCors(articlesJson.dump());
+    });
+
+    CROW_ROUTE(app, "/article/<int>")
+    ([](int idx) {
+        nlohmann::json article;
+        article["id"] = idx;
+
+        if (idx < 0)
+            return responseWithCors(error("Invalid article ID", article));
+
+        try {
+            if (zimmanager.isValidArticle(idx))
+                return responseWithCors(error("ID doesn't belong to an article", article));
+            article["title"] = zimmanager.getArticleTitle(idx);
+            article["html"] = zimmanager.getArticleHtml(idx);
+            std::cout << zimmanager.getArticleHtml(idx);
+        } catch (const std::exception& e) {
+            return responseWithCors(error("Invalid article ID: Index out of range", article));
+        }
+
+        return responseWithCors(article.dump());
     });
 
     app.port(18080).run();
