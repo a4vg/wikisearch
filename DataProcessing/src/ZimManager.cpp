@@ -3,6 +3,11 @@
 
 #include "ZimManager.h"
 
+bool isAcceptedMIMEtype(int m)
+{
+    return m==ACCEPTED_MYMETYPE1 || m==ACCEPTED_MYMETYPE2;
+}
+
 ZimManager::ZimManager(const std::string& filename) {
     auto f = new zim::File(filename);
     file = *f;
@@ -11,7 +16,7 @@ ZimManager::ZimManager(const std::string& filename) {
 ZimManager::iterator ZimManager::begin() {
     iterator iter(*this);
     iter.i = file.begin();
-    while(iter.i->getLibraryMimeType() != ACCEPTED_MYMETYPE)
+    while(!this->isValidArticle(iter.i->getIndex()))
         iter.i++;
     iter.update_values();
     return iter;
@@ -26,7 +31,7 @@ ZimManager::iterator ZimManager::end() {
 
 ZimManager::iterator ZimManager::iterator::operator++() {
     i++;
-    while (i!=file.end() && i->getLibraryMimeType() != ACCEPTED_MYMETYPE)
+    while (i!=file.end() && !ZimManager::isValidArticle(*i))
         i++;
 
     if (i!=file.end())
@@ -44,24 +49,28 @@ ZimManager::iterator ZimManager::getIteratorFromArticleId(size_t idx)
 
 std::string ZimManager::getArticleHtml(size_t idx)
 {
-    zim::Blob blob = file.getArticle(idx).getRedirectArticle().getData();
+    auto a = file.getArticle(idx);
+    if (a.isRedirect())
+        a = a.getRedirectArticle();
+    zim::Blob blob = a.getData();
     return std::string(blob.data(), blob.size());
 }
 
 bool ZimManager::isValidArticle(size_t idx)
 {
-    return file.getArticle(idx).getNamespace() == 'A' &&
-           file.getArticle(idx).getLibraryMimeType() == ACCEPTED_MYMETYPE;
+    return ZimManager::isValidArticle(file.getArticle(idx));
+}
+
+bool ZimManager::isValidArticle(const zim::Article &a)
+{
+    return a.getNamespace() == 'A' &&
+           !a.isRedirect() &&
+           isAcceptedMIMEtype(a.getLibraryMimeType());
 }
 
 std::string ZimManager::getArticleTitle(size_t idx)
 {
-    auto a = file.getArticle(idx);
-
-    std::cout << "Is redirect?: " << a.isRedirect() << "\n";
-    std::cout << "Redirected article: " << a.getRedirectArticle().getIndex() 
-              << "\nRedirected mimetype: " << a.getLibraryMimeType() << "\n";
-    return std::string(a.getTitle()) + " **** " + std::string(a.getRedirectArticle().getTitle());
+    return std::string(file.getArticle(idx).getTitle());
 }
 
 bool ZimManager::iterator::operator!=(const ZimManager::iterator& it2) {
@@ -70,7 +79,7 @@ bool ZimManager::iterator::operator!=(const ZimManager::iterator& it2) {
 
 void ZimManager::iterator::update_values() {
     value.first = i.getIndex();
-    zim::Blob blob = i->getRedirectArticle().getData();
+    zim::Blob blob = i->getData();
     value.second = parseWikipediaHTML(blob.data(), blob.size());
 }
 

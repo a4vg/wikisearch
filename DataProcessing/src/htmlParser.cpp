@@ -23,7 +23,7 @@ void cleanWikipediaHtmlTree(myhtml_tree_t* tree, myhtml_tree_node_t *body)
     std::vector<std::string> val_remove = { "referencias", "mw-content-text", "reflink"};
 
     // Bye references section
-    myhtml_collection_t *reference_nodes = myhtml_get_nodes_by_attribute_value(tree, NULL, body, true, id_str.c_str(), id_str.length(), val_remove[0].c_str(), val_remove[0].length(), NULL);
+    myhtml_collection_t *reference_nodes = myhtml_get_nodes_by_attribute_value(tree, NULL, NULL, true, id_str.c_str(), id_str.length(), val_remove[0].c_str(), val_remove[0].length(), NULL);
     if (reference_nodes->length)
     {
         myhtml_tree_node *reference_section = myhtml_node_parent(myhtml_node_parent(reference_nodes->list[0]));
@@ -34,7 +34,8 @@ void cleanWikipediaHtmlTree(myhtml_tree_t* tree, myhtml_tree_node_t *body)
     // Bye footer (last div in content)
     myhtml_collection_t *content_nodes = myhtml_get_nodes_by_attribute_value(tree, NULL, NULL, true, id_str.c_str(), id_str.length(), val_remove[1].c_str(), val_remove[1].length(), NULL);
     myhtml_collection_t *divs = myhtml_get_nodes_by_tag_id_in_scope(tree, NULL, content_nodes->list[0], MyHTML_TAG_DIV, NULL);
-    myhtml_node_remove(divs->list[divs->length-1]);
+    if (divs)
+        myhtml_node_remove(divs->list[divs->length-1]);
 
     // Bye references links (ex: [ref 2], [2])
     myhtml_collection_t *link_nodes = myhtml_get_nodes_by_attribute_value_contain(tree, NULL, NULL, true, class_str.c_str(), class_str.length(), val_remove[2].c_str(), val_remove[2].length(), NULL);

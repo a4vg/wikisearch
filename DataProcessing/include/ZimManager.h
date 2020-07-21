@@ -9,7 +9,8 @@
 #include <zim/fileiterator.h>
 #include "htmlParser.h"
 
-#define ACCEPTED_MYMETYPE 65535
+#define ACCEPTED_MYMETYPE1 7
+#define ACCEPTED_MYMETYPE2 65535
 
 class ZimManager;
 
@@ -36,6 +37,7 @@ public:
 
     std::string getArticleHtml(size_t idx);
     bool isValidArticle(size_t idx);
+    static bool isValidArticle(const zim::Article &a);
     std::string getArticleTitle(size_t idx);
     iterator getIteratorFromArticleId(size_t idx);
     iterator begin();
