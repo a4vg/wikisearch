@@ -73,12 +73,9 @@ void SearchEngineManager::process ()
 
     for(auto iter = manager->begin(); iter!=manager->end(); ++iter)
     {
-        std::cout << "\n=====================================================\n";
-        std::cout << "Article #" << (*iter).first << "\n";
         preprocessor.setText((*iter).second);
         auto wordCount = preprocessor.getWordCount();
         for (const auto& count: wordCount) {
-            std::cout << count.first << ": " << count.second << "\n";
             add_word (mytree, pm2, count.first, count.second, (*iter).first);
         }
     }

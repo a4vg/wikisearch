@@ -10,7 +10,7 @@ SRCDIR = ./src
 SRCFILES = $(wildcard $(SRCDIR)/*.cpp)
 OBJFILES = $(SRCFILES:.c=.o)
 
-DATADIR = data/
+DATADIR = ./data/
 
 processing : $(OBJFILES)
 	$(CXX) $(CXXVERSION) $(CXXFLAGS) $^ $@.cpp -o $@ $(LDFLAGS) ;\

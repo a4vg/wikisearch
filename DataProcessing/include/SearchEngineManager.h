@@ -14,8 +14,6 @@
 #define MAX_ARTICLES 10
 #define ORDER 4
 
-
-
 class SearchEngineManager
 {
 private:
