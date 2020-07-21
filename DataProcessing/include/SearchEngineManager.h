@@ -10,7 +10,10 @@
 #include "string.h"
 #include <vector>
 #include <sstream>
+#include <algorithm> // partial_sort
+#include <utility> // pair
 
+#define MAX_KEYWORDS 3
 #define MAX_ARTICLES 10
 #define ORDER 4
 
@@ -30,11 +33,12 @@ private:
     Preprocessor preprocessor;
     str treefile;
     str wordsfile;
+    str keywordfile;
 
     void add_word (bptree &, diskManager &, const str, const int, const int);
 
 public:
-    SearchEngineManager(const str ="", const str ="", const str ="");
+    SearchEngineManager(const str ="", const str ="", const str ="", const str ="");
     ~SearchEngineManager();
 
     void process ();
