@@ -15,7 +15,10 @@ int main(int argc, char* argv[])
         ZimManager manager(argv[1]);
 
         for(auto iter = manager.begin(); iter!=manager.end(); ++iter) {
-            std::cout << "[ " << (*iter).first << "] " << (*iter).second << '\n';
+            const size_t idx = (*iter).first;
+            std::cout << "[ " << idx << "] "; // << (*iter).second << '\n';
+            std::cout << manager.getArticleTitle(idx) <<"\n";
+            // std::cout << manager.getArticleHtml(idx) <<"\n";
         }
     }
     catch (const std::exception& e)

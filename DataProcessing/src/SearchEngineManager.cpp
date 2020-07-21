@@ -53,6 +53,7 @@ void SearchEngineManager::add_word (bptree &bt, diskManager &dm, const str word,
                 }
             } else {
                 articles [i] = temp;
+                break;
             }
         }
         dm->write_record (pid, articles);
@@ -98,7 +99,6 @@ void SearchEngineManager::print_search_word (const str word)
 
     bptree mtree (pm1);
     Cadena cad ((char *) word.c_str());
-    auto file = zim::File (zimfile);
 
     int id = mtree.search (cad);
 
@@ -107,11 +107,12 @@ void SearchEngineManager::print_search_word (const str word)
         std::pair<int, int> results [MAX_ARTICLES];
         pm2->retrieve_record (id, results);
         for (int i = 0; i < MAX_ARTICLES; i++){
+            const size_t idx = results[i].first;
             if (results[i].first > 0)
-            std::cout << "Article " << results[i].first << 
+            std::cout << "Article " << idx << 
             ": - Count:" << results[i].second << ", Title: " 
-            <<  file.getArticle(results[i].first).getTitle() << ", Namespace: "
-            << file.getArticle(results[i].first).getNamespace() << "\n";
+            <<  manager->getArticleTitle(idx) << ", Valid article?: "
+            << manager->isValidArticle(idx) << "\n";
         }
     } else {
         std::cout << "Not found " << word << "\n";
@@ -127,7 +128,6 @@ void SearchEngineManager::print_search_text (const str text)
 
     preprocessor.setText (text);
     auto wordstext = preprocessor.getWordCount ();
-    auto file = zim::File (zimfile);
 
     for (const auto& count: wordstext) 
         print_search_word (count.first);
