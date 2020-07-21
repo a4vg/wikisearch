@@ -12,6 +12,8 @@
 #include <sstream>
 #include <algorithm> // partial_sort
 #include <utility> // pair
+#include <thread>
+#include <mutex>
 
 #define MAX_KEYWORDS 3
 #define MAX_ARTICLES 10
@@ -35,6 +37,9 @@ private:
     str wordsfile;
     str keywordfile;
 
+    std::vector <std::thread *> threads;
+    std::mutex mtx;
+
     void add_word (bptree &, diskManager &, const str, const int, const int);
 
 public:
@@ -45,7 +50,8 @@ public:
     void print_search_word (const str);
     void print_search_text (const str);
     std::vector<size_t> search(const str);
-    void search_text_parallel (const str, int);
+    std::vector<size_t> search_text_parallel (const str);
+    void subsearch (const std::vector<str> , std::vector <size_t>&);
 
 };
 
