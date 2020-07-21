@@ -21,8 +21,7 @@ void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
         auto it = zimmanager.getIteratorFromArticleId(id);
         article["description"] = (*it).second;
 
-        // TODO
-        article["keywords"] = nlohmann::json::array();
+        article["keywords"] = sem.getArticleKeywords(id);
 
         articlesJson.push_back(article);
     }

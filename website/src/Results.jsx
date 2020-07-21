@@ -29,7 +29,7 @@ class Results extends Component {
     this.updateState();
   }
 
-  componentDidUpdate(props, state){
+  componentDidUpdate(){
     this.updateState();
   }
 
