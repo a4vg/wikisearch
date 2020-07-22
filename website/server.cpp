@@ -6,8 +6,8 @@
 #include "SearchEngineManager.h"
 #include "ZimManager.h"
 
-SearchEngineManager sem("../DataProcessing/data/zim/wiki-mini.zim");
-ZimManager zimmanager("../DataProcessing/data/zim/wiki-mini.zim");
+SearchEngineManager sem("../DataProcessing/data/zim/wiki-full.zim");
+ZimManager zimmanager("../DataProcessing/data/zim/wiki-full.zim");
 
 void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
 {
