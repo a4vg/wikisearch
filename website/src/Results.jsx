@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Ads from "./Ads";
 import { Link } from "react-router-dom";
 
 const server = "http://localhost:18080"
@@ -37,10 +38,12 @@ class Results extends Component {
     let { articles } = this.state;
     return (
       <div className="resultsContainer">
-      <h3>Se han encontrado { articles.length } resultados</h3>
       {
-        this.state.query && articles.length &&
-        articles.map((article) => (
+        this.state.query && articles.length
+        ?<React.Fragment>
+        <h3>Se han encontrado { articles.length } resultados</h3>
+        <Ads query={this.state.query}/>
+        { articles.map((article) => (
           <div key={article.id} className="result">
             <a href={`${server}/article/${article.id}`}>
               <h3>{article.title}</h3>
@@ -56,8 +59,10 @@ class Results extends Component {
             <p>{article.description}</p>
           </div>
         ))
+        }
+        </React.Fragment>
+        :<h3>No hay resultados</h3>
       }
-      {!articles.length && "No hay resultados"}
       </div>
     );
   }

@@ -6,22 +6,19 @@
 #include "SearchEngineManager.h"
 #include "ZimManager.h"
 
-SearchEngineManager sem("../DataProcessing/data/zim/wiki-mini.zim");
-ZimManager zimmanager("../DataProcessing/data/zim/wiki-mini.zim");
+SearchEngineManager sem("../DataProcessing/data/zim/wiki-full.zim");
+ZimManager zimmanager("../DataProcessing/data/zim/wiki-full.zim");
 
 void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
 {
-    std::cout << query << "\n";
     auto start = std::chrono::system_clock::now();
     auto matchesId = sem.ranked_search(query);
     auto end = std::chrono::system_clock::now();
 
     double time = std::chrono::duration_cast<std::chrono::milliseconds >( end - start).count();
 
-    std::cout<< "Encontrados " << matchesId.size()<< " resultados en "<< time/1000 << " segundos.\n";
     for (size_t id: matchesId)
     {
-        std::cout << "id: " << id << "\n";
         nlohmann::json article;
         article["id"] = id;
         article["title"] = zimmanager.getArticleTitle(id);
@@ -30,6 +27,8 @@ void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
         article["description"] = (*it).second;
 
         article["keywords"] = sem.getArticleKeywords(id);
+
+        article["time"] = time/1000;
 
         articlesJson.push_back(article);
     }
