@@ -12,7 +12,13 @@ ZimManager zimmanager("../DataProcessing/data/zim/wiki-mini.zim");
 void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
 {
     std::cout << query << "\n";
+    auto start = std::chrono::system_clock::now();
     auto matchesId = sem.ranked_search(query);
+    auto end = std::chrono::system_clock::now();
+
+    double time = std::chrono::duration_cast<std::chrono::milliseconds >( end - start).count();
+
+    std::cout<< "Encontrados " << matchesId.size()<< " resultados en "<< time/1000 << " segundos.\n";
     for (size_t id: matchesId)
     {
         std::cout << "id: " << id << "\n";
