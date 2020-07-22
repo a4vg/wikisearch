@@ -4,7 +4,7 @@
 #include "SearchEngineManager.h"
 
 bool compare(std::pair<size_t, double> a, std::pair<size_t, double> b){
-    return a.second > b.second;
+    return a.second < b.second;
 }
 
 SearchEngineManager::SearchEngineManager(const str zfile, const str tfile,
