@@ -50,6 +50,7 @@ public:
     std::vector<str> getArticleKeywords(size_t idx);
     void process (ZimManager::iterator itbegin, bool print=false, int print_count=100);
     void print_search_word (const str);
+    std::map <size_t,int> search_word (const str);
     void print_search_text (const str);
     std::set<size_t> search(const str);
     std::vector<size_t> ranked_search(const str);
