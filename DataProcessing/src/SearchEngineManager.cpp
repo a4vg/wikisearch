@@ -4,7 +4,7 @@
 #include "SearchEngineManager.h"
 
 bool compare(std::pair<size_t, double> a, std::pair<size_t, double> b){
-    return a.second > b.second;
+    return a.second < b.second;
 }
 
 SearchEngineManager::SearchEngineManager(const str zfile, const str tfile,
@@ -181,6 +181,40 @@ void SearchEngineManager::print_search_word (const str word)
     }
 }
 
+std::map <size_t, int> SearchEngineManager::search_word (const str word)
+{
+    if (word.empty ()){
+        std::cerr << "You need to provide a word to search" << std::endl;
+        exit(1);
+    }
+
+    diskManager pm1 = 
+        std::make_shared<DiskManager> (treefile, false);
+    diskManager pm2 = 
+        std::make_shared<DiskManager> (wordsfile, false);
+    std::shared_ptr<DiskManager> kwpm = 
+        std::make_shared<DiskManager> (keywordfile, false);
+
+    bptree mtree (pm1);
+    Cadena cad ((char *) word.c_str());
+
+    int id = mtree.search (cad);
+
+    std::map <size_t, int> res;
+
+    if (id != -1) {
+        std::pair<int, int> results [MAX_ARTICLES];
+        pm2->retrieve_record (id, results);
+        for (int i = 0; i < MAX_ARTICLES; i++){
+            const size_t artId = results[i].first;       
+            if (artId > 0) {
+                res [artId] = results[i].second;
+            }     
+        }
+    }
+    return res;
+}
+
 void SearchEngineManager::print_search_text (const str text)
 {
     if (text.empty ()){
@@ -251,22 +285,37 @@ std::set<size_t> SearchEngineManager::search(const str text)
 }
 
 std::vector<size_t> SearchEngineManager::ranked_search(const str text){
-    std::set<size_t> results = search(text);
+    //std::set<size_t> results = search(text);
     preprocessor.setText(text);
     std::map<size_t, double> m_rank;
     double tf_idf;
 
+    auto all_words = preprocessor.getWordCount ();
+    double max_n = all_words.size ();
+    for (auto &term: all_words) {
+        std::map <size_t, int> words_counts = search_word (term.first);
+        double df = words_counts.size ();
+        for (auto &doc: words_counts) {
+            double tf = doc.second;
+            tf_idf = double (log10(1 + tf));
+            tf_idf *= double (log10(max_n / df));
+            m_rank [doc.first] = tf_idf;
+        }
+    }
+/*
     for(auto&term:preprocessor.getWordCount()){
         for(auto&document:results){
             tf_idf = tfidf(document, term.first, results);
             m_rank[document] += tf_idf;
             //std::cout << term.first << 'x' << document << ':' << m_rank[document] << '\n';
         }
-    }
+    }*/
 
     std::vector<std::pair<size_t, double>> rank;
-    for(auto&p:m_rank)
+    for(auto&p:m_rank){
         rank.push_back(p);
+        std::cout << p.first << ": " << p.second << "\n";
+    }
 
     std::sort(rank.begin(), rank.end(), compare);
 
