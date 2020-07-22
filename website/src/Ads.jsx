@@ -20,7 +20,10 @@ class Ads extends Component {
     this.updateAds();
   }
 
-  componentDidUpdate(){
+  componentDidUpdate(prevpros){
+    if (this.props.query === prevpros.query)
+      return null;
+
     this.updateAds();
   }
   // http://i.linio.com/p/cc2d14d3d3aaf17ba3ee1788a475240b-catalog.jpg

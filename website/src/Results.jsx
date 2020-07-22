@@ -25,7 +25,6 @@ class Results extends Component {
 
         newState.articles = data.articles;
         newState.time = data.time;
-        console.log(data.time);
         this.setState(newState);
       });
   }
