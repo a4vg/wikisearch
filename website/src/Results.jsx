@@ -46,7 +46,7 @@ class Results extends Component {
       {
         this.state.query && articles.length
         ?<React.Fragment>
-        <h3>Se han encontrado { articles.length } resultados en {time} segundos</h3>
+        <h3>Se han encontrado { articles.length } resultados en {time} milisegundos</h3>
         <Ads query={this.state.query}/>
         { articles.map((article) => (
           <div key={article.id} className="result">

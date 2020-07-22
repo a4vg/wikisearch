@@ -11,11 +11,11 @@ ZimManager zimmanager("../DataProcessing/data/zim/wiki-full.zim");
 
 void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
 {
-    auto start = std::chrono::system_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     auto matchesId = sem.ranked_search(query);
-    auto end = std::chrono::system_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
 
-    double time = std::chrono::duration_cast<std::chrono::milliseconds >( end - start).count();
+    std::chrono::duration<double, std::milli> time = end - start;
 
     for (size_t id: matchesId)
     {
@@ -30,7 +30,7 @@ void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
 
         articlesJson["articles"].push_back(article);
     }
-    articlesJson["time"] = time/1000;
+    articlesJson["time"] = time.count();
 }
 
 crow::response responseWithCors(std::string x)
