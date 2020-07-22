@@ -34,6 +34,19 @@ body {
   min-width: 20rem;
 }
 
+.ad-container {
+  display: inline-block;
+  border: solid thin #5BA54A;
+  border-radius: 20px;
+  padding: 0 0 1em 1em;
+  
+}
+
+h3.ads-title {
+  margin-top: 1em !important;
+  margin-bottom: 0.4em !important;
+}
+
 /* Result title */
 .resultsContainer h3 {
   margin: 0;

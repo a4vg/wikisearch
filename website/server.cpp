@@ -11,11 +11,9 @@ ZimManager zimmanager("../DataProcessing/data/zim/wiki-full.zim");
 
 void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
 {
-    std::cout << query << "\n";
-    auto matchesId = sem.ranked_search(query);
+    auto matchesId = sem.search(query);
     for (size_t id: matchesId)
     {
-        std::cout << "id: " << id << "\n";
         nlohmann::json article;
         article["id"] = id;
         article["title"] = zimmanager.getArticleTitle(id);
