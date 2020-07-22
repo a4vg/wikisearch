@@ -70,7 +70,6 @@ void SearchEngineManager::add_word (bptree &bt, diskManager &dm, const str word,
 void SearchEngineManager::process (ZimManager::iterator itbegin, bool print, int print_count)
 {
     bool trunc = ((*itbegin).first == (*manager->begin()).first)? true : false;
-    std::cout << "Trunc :" << trunc << "\n"; 
 
     diskManager pm1 = 
         std::make_shared<DiskManager> (treefile, trunc);
@@ -312,10 +311,8 @@ std::vector<size_t> SearchEngineManager::ranked_search(const str text){
     }*/
 
     std::vector<std::pair<size_t, double>> rank;
-    for(auto&p:m_rank){
+    for(auto&p:m_rank)
         rank.push_back(p);
-        std::cout << p.first << ": " << p.second << "\n";
-    }
 
     std::sort(rank.begin(), rank.end(), compare);
 

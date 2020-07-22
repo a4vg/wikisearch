@@ -28,10 +28,9 @@ void getJsonFromSearch(nlohmann::json &articlesJson, std::string query)
 
         article["keywords"] = sem.getArticleKeywords(id);
 
-        article["time"] = time/1000;
-
-        articlesJson.push_back(article);
+        articlesJson["articles"].push_back(article);
     }
+    articlesJson["time"] = time/1000;
 }
 
 crow::response responseWithCors(std::string x)
@@ -60,7 +59,7 @@ int main()
         if (!q)
             return responseWithCors(error("Missing parameter q"));
 
-        nlohmann::json articlesJson = nlohmann::json::array();
+        nlohmann::json articlesJson = {{"articles", nlohmann::json::array()}};
         getJsonFromSearch(articlesJson, std::string(q));
         return responseWithCors(articlesJson.dump());
     });

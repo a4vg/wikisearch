@@ -29,8 +29,8 @@ class Ads extends Component {
   render() {
     return (
       <React.Fragment>
-        <h3 class="ads-title">Ads</h3>
-        <div class="ad-container">
+        <h3 className="ads-title">Ads</h3>
+        <div className="ad-container">
         {
           this.state.ads.map( (ad, id) => (
             <div key={id} className="result ad">

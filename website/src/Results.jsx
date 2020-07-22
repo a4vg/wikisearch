@@ -7,7 +7,8 @@ const server = "http://localhost:18080"
 class Results extends Component {
   state = {
     query: "",
-    articles: []
+    articles: [], 
+    time: 0
   };
 
   updateState = () => {
@@ -21,7 +22,10 @@ class Results extends Component {
     fetch(url)
       .then(r => r.json())
       .then(data => {
-        newState.articles = data;
+
+        newState.articles = data.articles;
+        newState.time = data.time;
+        console.log(data.time);
         this.setState(newState);
       });
   }
@@ -36,12 +40,13 @@ class Results extends Component {
 
   render() {
     let { articles } = this.state;
+    let { time } = this.state;
     return (
       <div className="resultsContainer">
       {
         this.state.query && articles.length
         ?<React.Fragment>
-        <h3>Se han encontrado { articles.length } resultados</h3>
+        <h3>Se han encontrado { articles.length } resultados en {time} segundos</h3>
         <Ads query={this.state.query}/>
         { articles.map((article) => (
           <div key={article.id} className="result">
