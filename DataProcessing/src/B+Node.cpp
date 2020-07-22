@@ -4,7 +4,9 @@
 #include "B+Node.hpp"
 
 Cadena::Cadena(char *c)
-{    strcpy(cad,c);
+{
+    strncpy(cad, c, (sizeof cad) - 1);
+    cad[39] = '\0';
 }
 
 Cadena::Cadena()

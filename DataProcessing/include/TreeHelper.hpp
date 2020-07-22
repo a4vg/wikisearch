@@ -181,12 +181,17 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
 
     
 
-    static int insert (node_t &node, const value_t& val, long idpage, Data &header, diskManager &dm){
+    static int insert (node_t &node, const value_t& val, long idpage, Data &header, diskManager &dm, int & final_position){
         int pos = 0;
-        while (pos < node.size && node.keys[pos] < val)
+        while (pos < node.size && node.keys[pos] <= val)
             pos++;
         
         if (node.is_leaf){
+          //Check if value is in leaf)
+          if (node.keys [pos - 1] == val) {
+            final_position = node.children [pos - 1];
+            return NORMAL;
+          } else {  
             for(int i = node.size; i > pos; i--){
                 node.keys[i] = node.keys[i - 1];
                 node.children[i] = node.children[i - 1];
@@ -196,10 +201,11 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
             node.size += 1;
 
             writeNode (node.disk_id, node, dm);
+          }
         } else {
             long page_id = node.children[pos];
             node_t child = readNode(page_id, dm);
-            int state = insert(child, val, idpage, header, dm);
+            int state = insert(child, val, idpage, header, dm, final_position);
             if (state == OVERFLOWNODE){
                 splitNode(node, pos, header, dm);
             }
@@ -208,12 +214,14 @@ struct TreeHelper<BPNode<T, S>,B_PLUS_NODE_FLAGXX>{
         return node.isOverflow() ? OVERFLOWNODE : NORMAL;
     }
 
-    static void insert (const value_t& val, long idpage, Data &header, diskManager &dm){
+    static int insert (const value_t& val, long idpage, Data &header, diskManager &dm){
       node_t root = readNode (header.root_id, dm);
-      int state = insert(root, val, idpage, header, dm);
+      int final_position = -1;
+      int state = insert(root, val, idpage, header, dm, final_position);
       if (state == OVERFLOWNODE){
         splitRoot (header, dm);
       }
+      return final_position;
     }
 
     static void print (Data &header, diskManager &dm){

@@ -38,8 +38,8 @@ class Tree <Node, true> {
 
   ~Tree(void){}
 
-  void insert(const value_t& val, long idpage){
-    add<NodeTraits<node_t>::flag_type>(val, idpage, data, dm);
+  int insert(const value_t& val, long idpage){
+    return add<NodeTraits<node_t>::flag_type>(val, idpage, data, dm);
   }
 
   void print(){
@@ -52,15 +52,15 @@ class Tree <Node, true> {
 
 
   template <int Flag> 
-  void add(const value_t&, long, Data&, diskManager&);
+  int add(const value_t&, long, Data&, diskManager&);
 
 };
 
 template<typename Node> template <int Flag>
-void Tree<Node, true>::add(
+int Tree<Node, true>::add(
   const typename Tree<Node, true>::value_t & val, long idpage,
   Data &data, diskManager &dm){
-  TreeHelper<Tree<Node, true>::node_t,Flag>::insert(val, idpage, data, dm);
+  return TreeHelper<Tree<Node, true>::node_t,Flag>::insert(val, idpage, data, dm);
 }
 
 
